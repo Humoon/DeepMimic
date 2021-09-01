@@ -9,6 +9,7 @@ import util.mpi_util as MPIUtil
 args = []
 world = None
 
+
 def run():
     global update_timestep
     global world
@@ -19,6 +20,7 @@ def run():
 
     return
 
+
 def shutdown():
     global world
 
@@ -26,12 +28,14 @@ def shutdown():
     world.shutdown()
     return
 
+
 def main():
     global args
     global world
 
     # Command line arguments
-    args = sys.argv[1:]
+    # args = sys.argv[1:]
+    args = ['arg_file', 'args/train_humanoid3d_spinkick_args.txt', 'num_workers', '1']
 
     world = build_world(args, enable_draw=False)
 
@@ -39,6 +43,7 @@ def main():
     shutdown()
 
     return
+
 
 if __name__ == '__main__':
     main()

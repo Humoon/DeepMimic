@@ -185,10 +185,8 @@ class ReplayBuffer(object):
 
     def _init_buffers(self, path):
         self.buffers = dict()
-        self.buffers[self.PATH_START_KEY] = MathUtil.INVALID_IDX * np.ones(
-            self.buffer_size, dtype=int)
-        self.buffers[self.PATH_END_KEY] = MathUtil.INVALID_IDX * np.ones(
-            self.buffer_size, dtype=int)
+        self.buffers[self.PATH_START_KEY] = MathUtil.INVALID_IDX * np.ones(self.buffer_size, dtype=int)
+        self.buffers[self.PATH_END_KEY] = MathUtil.INVALID_IDX * np.ones(self.buffer_size, dtype=int)
 
         for key in dir(path):
             val = getattr(path, key)

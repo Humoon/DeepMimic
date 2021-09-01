@@ -16,6 +16,9 @@
 *.o
 *.cxx
 *.so
+.vscode/
+.env
+.style.yapf
 
 
 .vs/

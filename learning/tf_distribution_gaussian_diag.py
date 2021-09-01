@@ -1,13 +1,17 @@
 from enum import Enum
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
+tf.disable_v2_behavior()
 import learning.tf_util as TFUtil
 from learning.tf_distribution import TFDistribution
-
 '''
 Gaussian Distribution - Diagonal Covariance
 '''
+
+
 class TFDistributionGaussianDiag(TFDistribution):
+
     class StdType(Enum):
         Default = 0
         Constant = 1
@@ -16,28 +20,47 @@ class TFDistributionGaussianDiag(TFDistribution):
     def identity(dim, name="identity"):
         mean = np.zeros(dim)
         logstd = np.zeros(dim)
-        dist = TFDistributionGaussianDiag(input=None, dim=dim, std_type=TFDistributionGaussianDiag.StdType.Default,
-                                          mean_kernel_init=None, mean_bias_init=None,
-                                          logstd_kernel_init=None, logstd_bias_init=None,
-                                          name=name, direct_mean=mean, direct_logstd=logstd)
+        dist = TFDistributionGaussianDiag(
+            input=None,
+            dim=dim,
+            std_type=TFDistributionGaussianDiag.StdType.Default,
+            mean_kernel_init=None,
+            mean_bias_init=None,
+            logstd_kernel_init=None,
+            logstd_bias_init=None,
+            name=name,
+            direct_mean=mean,
+            direct_logstd=logstd)
         return dist
 
     def from_params(mean, logstd, name="dist_gauss_diag"):
         dim = int(mean.shape[-1])
-        assert(dim == logstd.shape[-1])
-        dist = TFDistributionGaussianDiag(input=None, dim=dim, std_type=TFDistributionGaussianDiag.StdType.Default,
-                                          mean_kernel_init=None, mean_bias_init=None,
-                                          logstd_kernel_init=None, logstd_bias_init=None,
-                                          name=name, direct_mean=mean, direct_logstd=logstd)
+        assert (dim == logstd.shape[-1])
+        dist = TFDistributionGaussianDiag(
+            input=None,
+            dim=dim,
+            std_type=TFDistributionGaussianDiag.StdType.Default,
+            mean_kernel_init=None,
+            mean_bias_init=None,
+            logstd_kernel_init=None,
+            logstd_bias_init=None,
+            name=name,
+            direct_mean=mean,
+            direct_logstd=logstd)
         return dist
 
-    def __init__(self, input, dim, std_type,
-                 mean_kernel_init=tf.contrib.layers.xavier_initializer(),
-                 mean_bias_init=tf.zeros_initializer(), 
-                 logstd_kernel_init=tf.contrib.layers.xavier_initializer(),
-                 logstd_bias_init=tf.zeros_initializer(), 
-                 name="dist_gauss_diag", direct_mean=None, direct_logstd=None,
-                 reuse=False): 
+    def __init__(self,
+                 input,
+                 dim,
+                 std_type,
+                 mean_kernel_init=tf.glorot_uniform_initializer(),
+                 mean_bias_init=tf.zeros_initializer(),
+                 logstd_kernel_init=tf.glorot_uniform_initializer(),
+                 logstd_bias_init=tf.zeros_initializer(),
+                 name="dist_gauss_diag",
+                 direct_mean=None,
+                 direct_logstd=None,
+                 reuse=False):
 
         super().__init__(input)
 
@@ -55,17 +78,17 @@ class TFDistributionGaussianDiag(TFDistribution):
 
         with tf.variable_scope(name, reuse=reuse):
             self._build_params(reuse)
-        
+
         mean = self.get_mean()
         logstd = self.get_logstd()
         std = self.get_std()
-        
+
         mean_shape = mean.get_shape().as_list()
         logstd_shape = logstd.get_shape().as_list()
         std_shape = std.get_shape().as_list()
-        assert(mean_shape[-1] == self._dim)
-        assert(logstd_shape[-1] == self._dim)
-        assert(std_shape[-1] == self._dim)
+        assert (mean_shape[-1] == self._dim)
+        assert (logstd_shape[-1] == self._dim)
+        assert (std_shape[-1] == self._dim)
 
         return
 
@@ -88,13 +111,13 @@ class TFDistributionGaussianDiag(TFDistribution):
 
     def get_std(self):
         return self._std
-    
+
     def flat_params(self):
         mean_tf = self._mean
         logstd_tf = self._logstd
         mean_shape = mean_tf.get_shape().as_list()
         logstd_shape = logstd_tf.get_shape().as_list()
-        
+
         if (len(mean_shape) == 2 and len(logstd_shape) == 1):
             mean_rows = tf.shape(mean_tf)[0]
             logstd_tf = tf.reshape(logstd_tf, [1, logstd_shape[-1]])
@@ -110,14 +133,17 @@ class TFDistributionGaussianDiag(TFDistribution):
         logp_tf = -0.5 * tf.reduce_sum(tf.square(diff_tf / self._std), axis=-1)
         logp_tf += -0.5 * self._dim * np.log(2.0 * np.pi) - tf.reduce_sum(self._logstd, axis=-1)
         return logp_tf
-    
+
     def kl(self, other, eps=0):
         assert isinstance(other, TFDistributionGaussianDiag)
         other_var = tf.square(other.get_std())
         if (eps > 0):
             other_var = tf.maximum(other_var, eps * eps)
 
-        kl_tf = tf.reduce_sum(other.get_logstd() - self._logstd + (tf.square(self._std) + tf.square(self._mean - other.get_mean())) / (2.0 * other_var), axis=-1)
+        kl_tf = tf.reduce_sum(
+            other.get_logstd() - self._logstd + (tf.square(self._std) + tf.square(self._mean - other.get_mean())) /
+            (2.0 * other_var),
+            axis=-1)
         kl_tf += -0.5 * self._dim
         return kl_tf
 
@@ -129,7 +155,7 @@ class TFDistributionGaussianDiag(TFDistribution):
     def entropy(self):
         ent_tf = self._calc_entropy(self._logstd)
         return ent_tf
-    
+
     def sample(self):
         shape_tf = tf.shape(self._mean)
         noise = tf.random_normal(shape_tf)
@@ -143,7 +169,7 @@ class TFDistributionGaussianDiag(TFDistribution):
         return samples_tf
 
     def sample_clip(self, noise_clip):
-        assert(noise_clip >= 0.0)
+        assert (noise_clip >= 0.0)
 
         shape_tf = tf.shape(self._mean)
         noise = tf.random_normal(shape_tf)
@@ -156,13 +182,13 @@ class TFDistributionGaussianDiag(TFDistribution):
         cond_tf = cond
         cond_shape = cond_tf.get_shape().as_list()
         shape_tf = tf.shape(self._mean)
-        
+
         sample_tf = self._std * tf.random_normal(shape_tf)
-        
+
         sample_shape = sample_tf.get_shape().as_list()
         assert (len(sample_shape) == len(cond_shape) + 1)
         cond_tf = tf.expand_dims(cond_tf, axis=-1)
-        
+
         sample_tf = cond_tf * sample_tf
         sample_tf += self._mean
 
@@ -186,7 +212,7 @@ class TFDistributionGaussianDiag(TFDistribution):
             self._mean = tf.convert_to_tensor(self._mean, dtype=tf.float32)
 
         if (self._logstd is None):
-            self._logstd =  self._build_params_logstd(self._input, tf.shape(self._mean), "logstd", reuse)
+            self._logstd = self._build_params_logstd(self._input, tf.shape(self._mean), "logstd", reuse)
         elif (isinstance(self._logstd, np.ndarray)):
             self._logstd = tf.convert_to_tensor(self._logstd, dtype=tf.float32)
 
@@ -195,28 +221,35 @@ class TFDistributionGaussianDiag(TFDistribution):
         return
 
     def _build_params_mean(self, input, name, reuse):
-        mean = tf.layers.dense(inputs=input, units=self._dim, activation=None,
-                                kernel_initializer=self._mean_kernel_init,
-                                bias_initializer=self._mean_bias_init, 
-                                name=name, reuse=reuse)
+        mean = tf.layers.dense(
+            inputs=input,
+            units=self._dim,
+            activation=None,
+            kernel_initializer=self._mean_kernel_init,
+            bias_initializer=self._mean_bias_init,
+            name=name,
+            reuse=reuse)
         return mean
 
     def _build_params_logstd(self, input, mean_shape, name, reuse):
         if ((self._std_type == self.StdType.Default) or (self._std_type == self.StdType.Constant)):
             with tf.variable_scope(name, reuse=reuse):
                 trainable = (self._std_type == self.StdType.Constant)
-                logstd = tf.get_variable(dtype=tf.float32, name="bias", initializer=self._logstd_bias_init,
-                                          trainable=trainable)
+                logstd = tf.get_variable(dtype=tf.float32, name="bias", initializer=self._logstd_bias_init, trainable=trainable)
                 logstd = tf.broadcast_to(logstd, mean_shape)
 
         elif (self._std_type == self.StdType.Variable):
-            logstd = tf.layers.dense(inputs=input, units=self._dim, activation=None,
-                                kernel_initializer=self._logstd_kernel_init, 
-                                bias_initializer=self._logstd_bias_init, 
-                                name=name, reuse=reuse)
+            logstd = tf.layers.dense(
+                inputs=input,
+                units=self._dim,
+                activation=None,
+                kernel_initializer=self._logstd_kernel_init,
+                bias_initializer=self._logstd_bias_init,
+                name=name,
+                reuse=reuse)
 
         else:
-            assert(False), "Unsupported standard deviation type"
+            assert (False), "Unsupported standard deviation type"
 
         return logstd
 

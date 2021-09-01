@@ -1,5 +1,7 @@
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
+tf.disable_v2_behavior()
 import copy
 
 from learning.tf_agent import TFAgent
@@ -13,10 +15,10 @@ import util.mpi_util as MPIUtil
 import util.math_util as MathUtil
 from env.action_space import ActionSpace
 from env.env import Env
-
 '''
 Policy Gradient Agent
 '''
+
 
 class PGAgent(TFAgent):
     NAME = 'PG'
@@ -33,10 +35,10 @@ class PGAgent(TFAgent):
     CRITIC_WEIGHT_DECAY_KEY = 'CriticWeightDecay'
 
     MAIN_SCOPE = "main"
-    
+
     EXP_ACTION_FLAG = 1 << 0
 
-    def __init__(self, world, id, json_data): 
+    def __init__(self, world, id, json_data):
         self._exp_action = False
         super().__init__(world, id, json_data)
         return
@@ -62,8 +64,9 @@ class PGAgent(TFAgent):
 
         actor_net_name = json_data[self.ACTOR_NET_KEY]
         critic_net_name = json_data[self.CRITIC_NET_KEY]
-        actor_init_output_scale = 1 if (self.ACTOR_INIT_OUTPUT_SCALE_KEY not in json_data) else json_data[self.ACTOR_INIT_OUTPUT_SCALE_KEY]
-        
+        actor_init_output_scale = 1 if (self.ACTOR_INIT_OUTPUT_SCALE_KEY
+                                        not in json_data) else json_data[self.ACTOR_INIT_OUTPUT_SCALE_KEY]
+
         s_size = self.get_state_size()
         g_size = self.get_goal_size()
         a_size = self.get_action_size()
@@ -84,18 +87,18 @@ class PGAgent(TFAgent):
 
         if (self.critic_tf != None):
             Logger.print('Built critic net: ' + critic_net_name)
-            
+
         sample_norm_a_tf = self._norm_a_pd_tf.sample()
         self._sample_a_tf = self._a_norm.unnormalize_tf(sample_norm_a_tf)
         self._sample_a_logp_tf = self._norm_a_pd_tf.logp(sample_norm_a_tf)
-        
+
         mode_norm_a_tf = self._norm_a_pd_tf.get_mode()
         self._mode_a_tf = self._a_norm.unnormalize_tf(mode_norm_a_tf)
         self._mode_a_logp_tf = self._norm_a_pd_tf.logp(mode_norm_a_tf)
-        
+
         norm_tar_a_tf = self._a_norm.normalize_tf(self._a_tf)
         self._a_logp_tf = self._norm_a_pd_tf.logp(norm_tar_a_tf)
-        
+
         return
 
     def _build_losses(self, json_data):
@@ -108,16 +111,16 @@ class PGAgent(TFAgent):
 
         if (critic_weight_decay != 0):
             self._critic_loss_tf += critic_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/critic')
-        
+
         self._actor_loss_tf = self._adv_ph * self._a_logp_tf
         self._actor_loss_tf = -tf.reduce_mean(self._actor_loss_tf)
-        
+
         if (actor_bound_loss_weight != 0.0):
             self._actor_loss_tf += actor_bound_loss_weight * self._build_action_bound_loss(self._norm_a_pd_tf)
-        
+
         if (actor_weight_decay != 0):
             self.actor_loss_tf += actor_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/actor')
-        
+
         return
 
     def _build_solvers(self, json_data):
@@ -125,7 +128,7 @@ class PGAgent(TFAgent):
         actor_momentum = 0.9 if (self.ACTOR_MOMENTUM_KEY not in json_data) else json_data[self.ACTOR_MOMENTUM_KEY]
         critic_stepsize = 0.01 if (self.CRITIC_STEPSIZE_KEY not in json_data) else json_data[self.CRITIC_STEPSIZE_KEY]
         critic_momentum = 0.9 if (self.CRITIC_MOMENTUM_KEY not in json_data) else json_data[self.CRITIC_MOMENTUM_KEY]
-        
+
         critic_vars = self._tf_vars(self.MAIN_SCOPE + '/critic')
         critic_opt = tf.train.MomentumOptimizer(learning_rate=critic_stepsize, momentum=critic_momentum)
         self._critic_grad_tf = tf.gradients(self._critic_loss_tf, critic_vars)
@@ -141,7 +144,7 @@ class PGAgent(TFAgent):
     def _build_net_actor(self, net_name, input_tfs, init_output_scale, reuse=False):
         with tf.variable_scope('actor', reuse=reuse):
             h = NetBuilder.build_net(net_name, input_tfs, reuse)
-            
+
             std_type = TFDistributionGaussianDiag.StdType.Default
             a_size = self.get_action_size()
 
@@ -150,26 +153,30 @@ class PGAgent(TFAgent):
             logstd_kernel_init = tf.random_uniform_initializer(minval=-init_output_scale, maxval=init_output_scale)
             logstd_bias_init = np.log(self.exp_params_curr.noise) * np.ones(a_size)
             logstd_bias_init = logstd_bias_init.astype(np.float32)
-            
-            norm_a_pd_tf = TFDistributionGaussianDiag(input=h, dim=a_size, std_type=std_type,
-                                 mean_kernel_init=mean_kernel_init, mean_bias_init=mean_bias_init, 
-                                 logstd_kernel_init=logstd_kernel_init, logstd_bias_init=logstd_bias_init,
-                                 reuse=reuse)
+
+            norm_a_pd_tf = TFDistributionGaussianDiag(
+                input=h,
+                dim=a_size,
+                std_type=std_type,
+                mean_kernel_init=mean_kernel_init,
+                mean_bias_init=mean_bias_init,
+                logstd_kernel_init=logstd_kernel_init,
+                logstd_bias_init=logstd_bias_init,
+                reuse=reuse)
 
         return norm_a_pd_tf
-    
+
     def _build_net_critic(self, net_name, input_tfs, reuse=False):
         out_size = 1
 
         with tf.variable_scope('critic', reuse=reuse):
             h = NetBuilder.build_net(net_name, input_tfs, reuse)
-            val_tf = tf.layers.dense(inputs=h, units=out_size, activation=None,
-                                    kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                                    reuse=reuse)
+            val_tf = tf.layers.dense(
+                inputs=h, units=out_size, activation=None, kernel_initializer=tf.glorot_uniform_initializer(), reuse=reuse)
             val_tf = tf.squeeze(val_tf, axis=-1)
 
         return val_tf
-    
+
     def _get_actor_inputs(self):
         norm_s_tf = self._s_norm.normalize_tf(self._s_ph)
         input_tfs = [norm_s_tf]
@@ -177,7 +184,7 @@ class PGAgent(TFAgent):
             norm_g_tf = self._g_norm.normalize_tf(self._g_ph)
             input_tfs += [norm_g_tf]
         return input_tfs
-    
+
     def _get_critic_inputs(self):
         norm_s_tf = self._s_norm.normalize_tf(self._s_ph)
         input_tfs = [norm_s_tf]
@@ -189,7 +196,7 @@ class PGAgent(TFAgent):
     def _build_action_bound_loss(self, norm_a_pd_tf):
         norm_a_bound_min = self._a_norm.normalize(self._a_bound_min)
         norm_a_bound_max = self._a_norm.normalize(self._a_bound_max)
-        
+
         if (isinstance(norm_a_pd_tf, TFDistributionGaussianDiag)):
             logstd_min = -np.inf
             logstd_max = np.inf
@@ -197,10 +204,10 @@ class PGAgent(TFAgent):
             norm_a_logstd_max = logstd_max * np.ones_like(norm_a_bound_max)
             norm_a_bound_min = np.concatenate([norm_a_bound_min, norm_a_logstd_min], axis=-1)
             norm_a_bound_max = np.concatenate([norm_a_bound_max, norm_a_logstd_max], axis=-1)
-        
+
         a_bound_loss = norm_a_pd_tf.param_bound_loss(norm_a_bound_min, norm_a_bound_max)
         return a_bound_loss
-    
+
     def _initialize_vars(self):
         super()._initialize_vars()
         self._sync_solvers()
@@ -227,29 +234,23 @@ class PGAgent(TFAgent):
     def _eval_actor(self, s, g, exp_action):
         s = np.reshape(s, [-1, self.get_state_size()])
         g = np.reshape(g, [-1, self.get_goal_size()]) if self.has_goal() else None
-        
-        feed = {
-            self._s_ph : s,
-            self._g_ph : g
-        }
-        
+
+        feed = {self._s_ph: s, self._g_ph: g}
+
         if (exp_action):
             run_tfs = [self._sample_a_tf, self._sample_a_logp_tf]
         else:
             run_tfs = [self._mode_a_tf, self._mode_a_logp_tf]
-        
+
         a, logp = self.sess.run(run_tfs, feed_dict=feed)
 
         return a, logp
-    
+
     def _eval_critic(self, s, g):
         s = np.reshape(s, [-1, self.get_state_size()])
         g = np.reshape(g, [-1, self.get_goal_size()]) if self.has_goal() else None
 
-        feed = {
-            self._s_ph : s,
-            self._g_ph : g
-        }
+        feed = {self._s_ph: s, self._g_ph: g}
 
         val = self.sess.run(self._critic_tf, feed_dict=feed)
 
@@ -271,10 +272,10 @@ class PGAgent(TFAgent):
 
         critic_stepsize = self.critic_solver.get_stepsize()
         actor_stepsize = self.actor_solver.get_stepsize()
-        
+
         self.logger.log_tabular('Critic_Loss', critic_loss)
         self.logger.log_tabular('Critic_Stepsize', critic_stepsize)
-        self.logger.log_tabular('Actor_Loss', actor_loss) 
+        self.logger.log_tabular('Actor_Loss', actor_loss)
         self.logger.log_tabular('Actor_Stepsize', actor_stepsize)
 
         return
@@ -283,20 +284,16 @@ class PGAgent(TFAgent):
         idx = self.replay_buffer.sample(self._local_mini_batch_size)
         s = self.replay_buffer.get('states', idx)
         g = self.replay_buffer.get('goals', idx) if self.has_goal() else None
-        
+
         tar_vals = self._calc_updated_vals(idx)
         tar_vals = np.clip(tar_vals, self.val_min, self.val_max)
-        
-        feed = {
-            self._s_ph: s,
-            self._g_ph: g,
-            self._tar_val_ph: tar_vals
-        }
+
+        feed = {self._s_ph: s, self._g_ph: g, self._tar_val_ph: tar_vals}
 
         loss, grads = self.sess.run([self.critic_loss_tf, self.critic_grad_tf], feed)
         self.critic_solver.update(grads)
         return loss
-    
+
     def _update_actor(self):
         key = self.EXP_ACTION_FLAG
         idx = self.replay_buffer.sample_filtered(self._local_mini_batch_size, key)
@@ -310,12 +307,7 @@ class PGAgent(TFAgent):
         V_old = self._eval_critic(s, g)
         adv = V_new - V_old
 
-        feed = {
-            self._s_ph: s,
-            self._g_ph: g,
-            self._a_ph: a,
-            self._adv_ph: adv
-        }
+        feed = {self._s_ph: s, self._g_ph: g, self._a_ph: a, self._adv_ph: adv}
 
         loss, grads = self.sess.run([self._actor_loss_tf, self._actor_grad_tf], feed)
         self._actor_solver.update(grads)
@@ -335,8 +327,8 @@ class PGAgent(TFAgent):
             is_end = self.replay_buffer.is_path_end(idx)
             is_fail = self.replay_buffer.check_terminal_flag(idx, Env.Terminate.Fail)
             is_succ = self.replay_buffer.check_terminal_flag(idx, Env.Terminate.Succ)
-            is_fail = np.logical_and(is_end, is_fail) 
-            is_succ = np.logical_and(is_end, is_succ) 
+            is_fail = np.logical_and(is_end, is_fail)
+            is_succ = np.logical_and(is_end, is_succ)
 
             V_next = self._eval_critic(s_next, g_next)
             V_next[is_fail] = self.val_fail

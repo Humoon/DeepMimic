@@ -1,0 +1,10 @@
+{
+    "python.linting.pylintEnabled": true,
+    "files.associations": {
+        "*.vue": "vue",
+        "*.wpy": "vue",
+        "*.wxml": "html",
+        "*.wxss": "css",
+        "vector": "c"
+    }
+}

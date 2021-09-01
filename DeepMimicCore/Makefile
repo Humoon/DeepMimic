@@ -2,11 +2,11 @@ BIN=Main
 OBJ_DIR = objs
 MKDIR = mkdir -p
 
-EIGEN_DIR = ../../libraries/eigen
-BULLET_INC_DIR = ../../libraries/bullet3/src
+EIGEN_DIR = /usr/local/include/eigen3
+BULLET_INC_DIR = /usr/local/include/bullet
 
-PYTHON_INC = /usr/include/python3.6m
-PYTHON_LIB = /usr/lib/ -lpython3.6m
+PYTHON_INC = /usr/include/python3.8
+PYTHON_LIB = /usr/lib/python3.8
 
 INC = -I./ \
 	-I$(EIGEN_DIR) \

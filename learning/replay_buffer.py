@@ -5,6 +5,7 @@ import inspect as inspect
 from env.env import Env
 import util.math_util as MathUtil
 
+
 class ReplayBuffer(object):
     TERMINATE_KEY = 'terminate'
     PATH_START_KEY = 'path_start'
@@ -63,7 +64,7 @@ class ReplayBuffer(object):
         curr_buffer = self._sample_buffers[key]
         idx = curr_buffer.slot_to_idx[:curr_buffer.count]
         return idx
-    
+
     def get_path_start(self, idx):
         return self.buffers[self.PATH_START_KEY][idx]
 
@@ -102,7 +103,7 @@ class ReplayBuffer(object):
     def store(self, path):
         start_idx = MathUtil.INVALID_IDX
         n = path.pathlength()
-        
+
         if (n > 0):
             assert path.is_valid()
 
@@ -119,7 +120,7 @@ class ReplayBuffer(object):
                 start_idx = idx[0]
             else:
                 Logger.print('Invalid path data value detected')
-        
+
         return start_idx
 
     def clear(self):
@@ -179,13 +180,15 @@ class ReplayBuffer(object):
     def _free_sample_buffers(self, idx):
         for key in self._sample_buffers:
             curr_buffer = self._sample_buffers[key]
-            curr_buffer.free(idx)    
+            curr_buffer.free(idx)
         return
 
     def _init_buffers(self, path):
         self.buffers = dict()
-        self.buffers[self.PATH_START_KEY] = MathUtil.INVALID_IDX * np.ones(self.buffer_size, dtype=int);
-        self.buffers[self.PATH_END_KEY] = MathUtil.INVALID_IDX * np.ones(self.buffer_size, dtype=int);
+        self.buffers[self.PATH_START_KEY] = MathUtil.INVALID_IDX * np.ones(
+            self.buffer_size, dtype=int)
+        self.buffers[self.PATH_END_KEY] = MathUtil.INVALID_IDX * np.ones(
+            self.buffer_size, dtype=int)
 
         for key in dir(path):
             val = getattr(path, key)
@@ -201,7 +204,7 @@ class ReplayBuffer(object):
                     else:
                         shape = [self.buffer_size]
                         dtype = val_type
-                    
+
                     self.buffers[key] = np.zeros(shape, dtype=dtype)
         return
 
@@ -225,12 +228,12 @@ class ReplayBuffer(object):
         return idx
 
     def _free_idx(self, idx):
-        assert(idx[0] <= idx[-1])
+        assert (idx[0] <= idx[-1])
         n = len(idx)
         if self.buffer_tail != MathUtil.INVALID_IDX:
             update_tail = idx[0] <= idx[-1] and idx[0] <= self.buffer_tail and idx[-1] >= self.buffer_tail
             update_tail |= idx[0] > idx[-1] and (idx[0] <= self.buffer_tail or idx[-1] >= self.buffer_tail)
-            
+
             if update_tail:
                 i = 0
                 while i < n:
@@ -248,10 +251,10 @@ class ReplayBuffer(object):
                             self.buffers[self.PATH_START_KEY][0:end_idx + 1] = MathUtil.INVALID_IDX
                             self._free_sample_buffers(list(range(start_idx, self.buffer_size)))
                             self._free_sample_buffers(list(range(0, end_idx + 1)))
-                        
+
                         self.num_paths -= 1
                         i += pathlen + 1
-                        self.buffer_tail = (end_idx + 1) % self.buffer_size;
+                        self.buffer_tail = (end_idx + 1) % self.buffer_size
                     else:
                         i += 1
         else:
@@ -272,14 +275,16 @@ class ReplayBuffer(object):
         self.buffers[self.PATH_END_KEY][idx] = idx[-1]
         return
 
+
 class SampleBuffer(object):
+
     def __init__(self, size):
         self.idx_to_slot = np.empty(shape=[size], dtype=int)
         self.slot_to_idx = np.empty(shape=[size], dtype=int)
         self.count = 0
         self.clear()
         return
-    
+
     def clear(self):
         self.idx_to_slot.fill(MathUtil.INVALID_IDX)
         self.slot_to_idx.fill(MathUtil.INVALID_IDX)
@@ -338,7 +343,7 @@ class SampleBuffer(object):
                         valid = False
                         break
 
-                s2i = self.slot_to_idx[i] 
+                s2i = self.slot_to_idx[i]
                 if s2i != MathUtil.INVALID_IDX:
                     i2s = self.idx_to_slot[s2i]
                     if i2s != i:

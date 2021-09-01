@@ -34,6 +34,7 @@ updates_per_sec = 0
 args = []
 world = None
 
+
 def build_arg_parser(args):
     arg_parser = ArgParser()
     arg_parser.load_args(args)
@@ -59,6 +60,7 @@ def update_intermediate_buffer():
 
     return
 
+
 def update_world(world, time_elapsed):
     num_substeps = world.env.get_num_update_substeps()
     timestep = time_elapsed / num_substeps
@@ -79,16 +81,18 @@ def update_world(world, time_elapsed):
             break
     return
 
+
 def draw():
     global reshaping
 
     update_intermediate_buffer()
     world.env.draw()
-    
+
     glutSwapBuffers()
     reshaping = False
 
     return
+
 
 def reshape(w, h):
     global reshaping
@@ -101,6 +105,7 @@ def reshape(w, h):
 
     return
 
+
 def step_anim(timestep):
     global animating
     global world
@@ -110,6 +115,7 @@ def step_anim(timestep):
     glutPostRedisplay()
     return
 
+
 def reload():
     global world
     global args
@@ -117,9 +123,11 @@ def reload():
     world = build_world(args, enable_draw=True)
     return
 
+
 def reset():
     world.reset()
     return
+
 
 def get_num_timesteps():
     global playback_speed
@@ -131,6 +139,7 @@ def get_num_timesteps():
     num_steps = np.abs(num_steps)
     return num_steps
 
+
 def calc_display_anim_time(num_timestes):
     global display_anim_time
     global playback_speed
@@ -138,6 +147,7 @@ def calc_display_anim_time(num_timestes):
     anim_time = int(display_anim_time * num_timestes / playback_speed)
     anim_time = np.abs(anim_time)
     return anim_time
+
 
 def shutdown():
     global world
@@ -147,9 +157,11 @@ def shutdown():
     sys.exit(0)
     return
 
+
 def get_curr_time():
     curr_time = glutGet(GLUT_ELAPSED_TIME)
     return curr_time
+
 
 def init_time():
     global prev_time
@@ -157,6 +169,7 @@ def init_time():
     prev_time = get_curr_time()
     updates_per_sec = 0
     return
+
 
 def animate(callback_val):
     global prev_time
@@ -169,23 +182,23 @@ def animate(callback_val):
         num_steps = get_num_timesteps()
         curr_time = get_curr_time()
         time_elapsed = curr_time - prev_time
-        prev_time = curr_time;
+        prev_time = curr_time
 
         timestep = -update_timestep if (playback_speed < 0) else update_timestep
         for i in range(num_steps):
             update_world(world, timestep)
-        
+
         # FPS counting
         update_count = num_steps / (0.001 * time_elapsed)
         if (np.isfinite(update_count)):
-            updates_per_sec = counter_decay * updates_per_sec + (1 - counter_decay) * update_count;
-            world.env.set_updates_per_sec(updates_per_sec);
-            
+            updates_per_sec = counter_decay * updates_per_sec + (1 - counter_decay) * update_count
+            world.env.set_updates_per_sec(updates_per_sec)
+
         timer_step = calc_display_anim_time(num_steps)
         update_dur = get_curr_time() - curr_time
         timer_step -= update_dur
         timer_step = np.maximum(timer_step, 0)
-        
+
         glutTimerFunc(int(timer_step), animate, 0)
         glutPostRedisplay()
 
@@ -193,6 +206,7 @@ def animate(callback_val):
         shutdown()
 
     return
+
 
 def toggle_animate():
     global animating
@@ -202,6 +216,7 @@ def toggle_animate():
         glutTimerFunc(display_anim_time, animate, 0)
 
     return
+
 
 def change_playback_speed(delta):
     global playback_speed
@@ -215,6 +230,7 @@ def change_playback_speed(delta):
 
     return
 
+
 def toggle_training():
     global world
 
@@ -225,6 +241,7 @@ def toggle_training():
         Logger.print('Training disabled')
     return
 
+
 def keyboard(key, x, y):
     key_val = int.from_bytes(key, byteorder='big')
     world.env.keyboard(key_val, x, y)
@@ -232,46 +249,50 @@ def keyboard(key, x, y):
     if (key == b'\x1b'): # escape
         shutdown()
     elif (key == b' '):
-        toggle_animate();
+        toggle_animate()
     elif (key == b'>'):
-        step_anim(update_timestep);
+        step_anim(update_timestep)
     elif (key == b'<'):
-        step_anim(-update_timestep);
+        step_anim(-update_timestep)
     elif (key == b','):
-        change_playback_speed(-playback_delta);
+        change_playback_speed(-playback_delta)
     elif (key == b'.'):
-        change_playback_speed(playback_delta);
+        change_playback_speed(playback_delta)
     elif (key == b'/'):
-        change_playback_speed(-playback_speed + 1);
+        change_playback_speed(-playback_speed + 1)
     elif (key == b'l'):
-        reload();
+        reload()
     elif (key == b'r'):
-        reset();
+        reset()
     elif (key == b't'):
         toggle_training()
 
     glutPostRedisplay()
     return
 
+
 def mouse_click(button, state, x, y):
     world.env.mouse_click(button, state, x, y)
     glutPostRedisplay()
 
+
 def mouse_move(x, y):
     world.env.mouse_move(x, y)
     glutPostRedisplay()
-    
+
     return
 
+
 def init_draw():
-    glutInit()  
-    
+    glutInit()
+
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(win_width, win_height)
     glutCreateWindow(b'DeepMimic')
 
     return
-    
+
+
 def setup_draw():
     glutDisplayFunc(draw)
     glutReshapeFunc(reshape)
@@ -282,8 +303,9 @@ def setup_draw():
 
     reshape(win_width, win_height)
     world.env.reshape(win_width, win_height)
-    
+
     return
+
 
 def build_world(args, enable_draw, playback_speed=1):
     arg_parser = build_arg_parser(args)
@@ -292,10 +314,12 @@ def build_world(args, enable_draw, playback_speed=1):
     world.env.set_playback_speed(playback_speed)
     return world
 
+
 def draw_main_loop():
     init_time()
     glutMainLoop()
     return
+
 
 def main():
     global args
@@ -309,6 +333,7 @@ def main():
     draw_main_loop()
 
     return
+
 
 if __name__ == '__main__':
     main()

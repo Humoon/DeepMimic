@@ -2,6 +2,7 @@ import json
 import numpy as np
 import util.math_util as MathUtil
 
+
 class ExpParams(object):
     RATE_KEY = 'Rate'
     NOISE_KEY = 'Noise'

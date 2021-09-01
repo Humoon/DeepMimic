@@ -1,6 +1,8 @@
 import numpy as np
 import copy as copy
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
+tf.disable_v2_behavior()
 
 from learning.pg_agent import PGAgent
 from learning.solvers.mpi_solver import MPISolver
@@ -10,10 +12,10 @@ from util.logger import Logger
 import util.mpi_util as MPIUtil
 import util.math_util as MathUtil
 from env.env import Env
-
 '''
 Proximal Policy Optimization Agent
 '''
+
 
 class PPOAgent(PGAgent):
     NAME = "PPO"
@@ -23,10 +25,10 @@ class PPOAgent(PGAgent):
     NORM_ADV_CLIP_KEY = "NormAdvClip"
     TD_LAMBDA_KEY = "TDLambda"
     TAR_CLIP_FRAC = "TarClipFrac"
-    
+
     ADV_EPS = 1e-5
 
-    def __init__(self, world, id, json_data): 
+    def __init__(self, world, id, json_data):
         super().__init__(world, id, json_data)
         return
 
@@ -43,7 +45,7 @@ class PPOAgent(PGAgent):
         num_procs = MPIUtil.get_num_procs()
         self._local_batch_size = int(np.ceil(self.batch_size / num_procs))
         min_replay_size = 2 * self._local_batch_size # needed to prevent buffer overflow
-        assert(self.replay_buffer_size > min_replay_size)
+        assert (self.replay_buffer_size > min_replay_size)
 
         self.replay_buffer_size = np.maximum(min_replay_size, self.replay_buffer_size)
 
@@ -55,7 +57,8 @@ class PPOAgent(PGAgent):
 
         actor_net_name = json_data[self.ACTOR_NET_KEY]
         critic_net_name = json_data[self.CRITIC_NET_KEY]
-        actor_init_output_scale = 1 if (self.ACTOR_INIT_OUTPUT_SCALE_KEY not in json_data) else json_data[self.ACTOR_INIT_OUTPUT_SCALE_KEY]
+        actor_init_output_scale = 1 if (self.ACTOR_INIT_OUTPUT_SCALE_KEY
+                                        not in json_data) else json_data[self.ACTOR_INIT_OUTPUT_SCALE_KEY]
 
         s_size = self.get_state_size()
         g_size = self.get_goal_size()
@@ -72,43 +75,43 @@ class PPOAgent(PGAgent):
         with tf.variable_scope('main'):
             self._norm_a_pd_tf = self._build_net_actor(actor_net_name, self._get_actor_inputs(), actor_init_output_scale)
             self._critic_tf = self._build_net_critic(critic_net_name, self._get_critic_inputs())
-                
+
         if (self._norm_a_pd_tf != None):
             Logger.print("Built actor net: " + actor_net_name)
 
         if (self._critic_tf != None):
             Logger.print("Built critic net: " + critic_net_name)
-        
+
         sample_norm_a_tf = self._norm_a_pd_tf.sample()
         self._sample_a_tf = self._a_norm.unnormalize_tf(sample_norm_a_tf)
         self._sample_a_logp_tf = self._norm_a_pd_tf.logp(sample_norm_a_tf)
-        
+
         mode_norm_a_tf = self._norm_a_pd_tf.get_mode()
         self._mode_a_tf = self._a_norm.unnormalize_tf(mode_norm_a_tf)
         self._mode_a_logp_tf = self._norm_a_pd_tf.logp(mode_norm_a_tf)
-        
+
         norm_tar_a_tf = self._a_norm.normalize_tf(self._a_ph)
         self._a_logp_tf = self._norm_a_pd_tf.logp(norm_tar_a_tf)
-        
+
         return
 
     def _build_losses(self, json_data):
         actor_bound_loss_weight = 10.0
         actor_weight_decay = 0 if (self.ACTOR_WEIGHT_DECAY_KEY not in json_data) else json_data[self.ACTOR_WEIGHT_DECAY_KEY]
         critic_weight_decay = 0 if (self.CRITIC_WEIGHT_DECAY_KEY not in json_data) else json_data[self.CRITIC_WEIGHT_DECAY_KEY]
-        
+
         val_diff = self._tar_val_ph - self._critic_tf
         self._critic_loss_tf = 0.5 * tf.reduce_mean(tf.square(val_diff))
 
         if (critic_weight_decay != 0):
             self._critic_loss_tf += critic_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/critic')
-        
+
         ratio_tf = tf.exp(self._a_logp_tf - self._old_logp_ph)
         actor_loss0 = self._adv_ph * ratio_tf
         actor_loss1 = self._adv_ph * tf.clip_by_value(ratio_tf, 1.0 - self.ratio_clip, 1 + self.ratio_clip)
         actor_loss_tf = tf.minimum(actor_loss0, actor_loss1)
         self._actor_loss_tf = -tf.reduce_mean(actor_loss_tf)
-        
+
         # for debugging
         self._clip_frac_tf = tf.reduce_mean(tf.to_float(tf.greater(tf.abs(ratio_tf - 1.0), self.ratio_clip)))
 
@@ -117,7 +120,7 @@ class PPOAgent(PGAgent):
 
         if (actor_weight_decay != 0):
             self._actor_loss_tf += actor_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/actor')
-         
+
         return
 
     def _build_solvers(self, json_data):
@@ -125,7 +128,7 @@ class PPOAgent(PGAgent):
         actor_momentum = 0.9 if (self.ACTOR_MOMENTUM_KEY not in json_data) else json_data[self.ACTOR_MOMENTUM_KEY]
         critic_stepsize = 0.01 if (self.CRITIC_STEPSIZE_KEY not in json_data) else json_data[self.CRITIC_STEPSIZE_KEY]
         critic_momentum = 0.9 if (self.CRITIC_MOMENTUM_KEY not in json_data) else json_data[self.CRITIC_MOMENTUM_KEY]
-        
+
         critic_vars = self._tf_vars(self.MAIN_SCOPE + '/critic')
         critic_opt = tf.train.MomentumOptimizer(learning_rate=critic_stepsize, momentum=critic_momentum)
         self._critic_grad_tf = tf.gradients(self._critic_loss_tf, critic_vars)
@@ -135,20 +138,20 @@ class PPOAgent(PGAgent):
         actor_opt = tf.train.MomentumOptimizer(learning_rate=actor_stepsize, momentum=actor_momentum)
         self._actor_grad_tf = tf.gradients(self._actor_loss_tf, actor_vars)
         self._actor_solver = MPISolver(self.sess, actor_opt, actor_vars)
-        
+
         return
 
     def _train_step(self):
         start_idx = self.replay_buffer.buffer_tail
         end_idx = self.replay_buffer.buffer_head
-        assert(start_idx == 0)
-        assert(self.replay_buffer.get_current_size() <= self.replay_buffer.buffer_size) # must avoid overflow
-        assert(start_idx < end_idx)
+        assert (start_idx == 0)
+        assert (self.replay_buffer.get_current_size() <= self.replay_buffer.buffer_size) # must avoid overflow
+        assert (start_idx < end_idx)
 
-        idx = np.array(list(range(start_idx, end_idx)))        
+        idx = np.array(list(range(start_idx, end_idx)))
         end_mask = self.replay_buffer.is_path_end(idx)
-        end_mask = np.logical_not(end_mask) 
-        
+        end_mask = np.logical_not(end_mask)
+
         rewards = self._fetch_batch_rewards(start_idx, end_idx)
         vals = self._compute_batch_vals(start_idx, end_idx)
         new_vals = self._compute_batch_new_vals(start_idx, end_idx, rewards, vals)
@@ -158,12 +161,12 @@ class PPOAgent(PGAgent):
         num_valid_idx = valid_idx.shape[0]
         num_exp_idx = exp_idx.shape[0]
         exp_idx = np.column_stack([exp_idx, np.array(list(range(0, num_exp_idx)), dtype=np.int32)])
-        
+
         local_sample_count = valid_idx.size
         global_sample_count = int(MPIUtil.reduce_sum(local_sample_count))
         mini_batches = int(np.ceil(global_sample_count / self.mini_batch_size))
-        
-        adv = new_vals[exp_idx[:,0]] - vals[exp_idx[:,0]]
+
+        adv = new_vals[exp_idx[:, 0]] - vals[exp_idx[:, 0]]
         new_vals = np.clip(new_vals, self.val_min, self.val_max)
 
         adv_mean = np.mean(adv)
@@ -192,18 +195,19 @@ class PPOAgent(PGAgent):
                 critic_batch = valid_idx[critic_batch]
                 actor_batch = exp_idx[actor_batch]
                 critic_batch_vals = new_vals[critic_batch]
-                actor_batch_adv = adv[actor_batch[:,1]]
+                actor_batch_adv = adv[actor_batch[:, 1]]
 
                 critic_s = self.replay_buffer.get('states', critic_batch)
                 critic_g = self.replay_buffer.get('goals', critic_batch) if self.has_goal() else None
                 curr_critic_loss = self._update_critic(critic_s, critic_g, critic_batch_vals)
 
-                actor_s = self.replay_buffer.get("states", actor_batch[:,0])
-                actor_g = self.replay_buffer.get("goals", actor_batch[:,0]) if self.has_goal() else None
-                actor_a = self.replay_buffer.get("actions", actor_batch[:,0])
-                actor_logp = self.replay_buffer.get("logps", actor_batch[:,0])
-                curr_actor_loss, curr_actor_clip_frac = self._update_actor(actor_s, actor_g, actor_a, actor_logp, actor_batch_adv)
-                
+                actor_s = self.replay_buffer.get("states", actor_batch[:, 0])
+                actor_g = self.replay_buffer.get("goals", actor_batch[:, 0]) if self.has_goal() else None
+                actor_a = self.replay_buffer.get("actions", actor_batch[:, 0])
+                actor_logp = self.replay_buffer.get("logps", actor_batch[:, 0])
+                curr_actor_loss, curr_actor_clip_frac = self._update_actor(actor_s, actor_g, actor_a, actor_logp,
+                                                                           actor_batch_adv)
+
                 critic_loss += curr_critic_loss
                 actor_loss += np.abs(curr_actor_loss)
                 actor_clip_frac += curr_actor_clip_frac
@@ -225,7 +229,7 @@ class PPOAgent(PGAgent):
 
         self.logger.log_tabular('Critic_Loss', critic_loss)
         self.logger.log_tabular('Critic_Stepsize', critic_stepsize)
-        self.logger.log_tabular('Actor_Loss', actor_loss) 
+        self.logger.log_tabular('Actor_Loss', actor_loss)
         self.logger.log_tabular('Actor_Stepsize', actor_stepsize)
         self.logger.log_tabular('Clip_Frac', actor_clip_frac)
         self.logger.log_tabular('Adv_Mean', adv_mean)
@@ -235,7 +239,7 @@ class PPOAgent(PGAgent):
         super()._train()
         self.replay_buffer.clear()
         return
-    
+
     def _fetch_batch_rewards(self, start_idx, end_idx):
         rewards = self.replay_buffer.get_all("rewards")[start_idx:end_idx]
         return rewards
@@ -251,13 +255,13 @@ class PPOAgent(PGAgent):
     def _compute_batch_vals(self, start_idx, end_idx):
         states = self.replay_buffer.get_all("states")[start_idx:end_idx]
         goals = self.replay_buffer.get_all("goals")[start_idx:end_idx] if self.has_goal() else None
-        
-        idx = np.array(list(range(start_idx, end_idx)))        
+
+        idx = np.array(list(range(start_idx, end_idx)))
         is_end = self.replay_buffer.is_path_end(idx)
         is_fail = self.replay_buffer.check_terminal_flag(idx, Env.Terminate.Fail)
         is_succ = self.replay_buffer.check_terminal_flag(idx, Env.Terminate.Succ)
-        is_fail = np.logical_and(is_end, is_fail) 
-        is_succ = np.logical_and(is_end, is_succ) 
+        is_fail = np.logical_and(is_end, is_fail)
+        is_succ = np.logical_and(is_end, is_succ)
 
         vals = self._eval_critic(states, goals)
         vals[is_fail] = self.val_fail
@@ -280,31 +284,20 @@ class PPOAgent(PGAgent):
 
                 new_vals[idx0:idx1] = RLUtil.compute_return(r, self.discount, self.td_lambda, v)
                 curr_idx = idx1 + start_idx + 1
-        
+
         return new_vals
 
     def _update_critic(self, s, g, tar_vals):
-        feed = {
-            self._s_ph: s,
-            self._g_ph: g,
-            self._tar_val_ph: tar_vals
-        }
+        feed = {self._s_ph: s, self._g_ph: g, self._tar_val_ph: tar_vals}
 
         loss, grads = self.sess.run([self._critic_loss_tf, self._critic_grad_tf], feed)
         self._critic_solver.update(grads)
         return loss
-    
-    def _update_actor(self, s, g, a, logp, adv):
-        feed = {
-            self._s_ph: s,
-            self._g_ph: g,
-            self._a_ph: a,
-            self._adv_ph: adv,
-            self._old_logp_ph: logp
-        }
 
-        loss, grads, clip_frac = self.sess.run([self._actor_loss_tf, self._actor_grad_tf,
-                                                self._clip_frac_tf], feed)
+    def _update_actor(self, s, g, a, logp, adv):
+        feed = {self._s_ph: s, self._g_ph: g, self._a_ph: a, self._adv_ph: adv, self._old_logp_ph: logp}
+
+        loss, grads, clip_frac = self.sess.run([self._actor_loss_tf, self._actor_grad_tf, self._clip_frac_tf], feed)
         self._actor_solver.update(grads)
 
         return loss, clip_frac

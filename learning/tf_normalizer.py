@@ -1,7 +1,10 @@
 import numpy as np
 import copy
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
+tf.disable_v2_behavior()
 from learning.normalizer import Normalizer
+
 
 class TFNormalizer(Normalizer):
 
@@ -40,28 +43,22 @@ class TFNormalizer(Normalizer):
     def unnormalize_tf(self, norm_x):
         x = norm_x * self.std_tf + self.mean_tf
         return x
-    
+
     def _build_resource_tf(self):
-        self.count_tf = tf.get_variable(dtype=tf.int32, name='count', initializer=np.array([self.count], dtype=np.int32), trainable=False)
+        self.count_tf = tf.get_variable(
+            dtype=tf.int32, name='count', initializer=np.array([self.count], dtype=np.int32), trainable=False)
         self.mean_tf = tf.get_variable(dtype=tf.float32, name='mean', initializer=self.mean.astype(np.float32), trainable=False)
         self.std_tf = tf.get_variable(dtype=tf.float32, name='std', initializer=self.std.astype(np.float32), trainable=False)
-        
+
         self.count_ph = tf.get_variable(dtype=tf.int32, name='count_ph', shape=[1])
         self.mean_ph = tf.get_variable(dtype=tf.float32, name='mean_ph', shape=self.mean.shape)
         self.std_ph = tf.get_variable(dtype=tf.float32, name='std_ph', shape=self.std.shape)
-        
+
         self._update_op = tf.group(
-            self.count_tf.assign(self.count_ph),
-            self.mean_tf.assign(self.mean_ph),
-            self.std_tf.assign(self.std_ph)
-        )
+            self.count_tf.assign(self.count_ph), self.mean_tf.assign(self.mean_ph), self.std_tf.assign(self.std_ph))
         return
 
     def _update_resource_tf(self):
-        feed = {
-            self.count_ph: np.array([self.count], dtype=np.int32),
-            self.mean_ph: self.mean,
-            self.std_ph: self.std
-        }
+        feed = {self.count_ph: np.array([self.count], dtype=np.int32), self.mean_ph: self.mean, self.std_ph: self.std}
         self.sess.run(self._update_op, feed_dict=feed)
         return

@@ -1,5 +1,7 @@
 from mpi4py import MPI
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
+tf.disable_v2_behavior()
 import numpy as np
 import learning.tf_util as TFUtil
 import util.math_util as MathUtil
@@ -7,6 +9,7 @@ import util.mpi_util as MPIUtil
 from util.logger import Logger
 
 from learning.solvers.solver import Solver
+
 
 class MPISolver(Solver):
     CHECK_SYNC_ITERS = 1000
@@ -24,7 +27,7 @@ class MPISolver(Solver):
         grad_dim = self._calc_grad_dim()
         self._flat_grad = np.zeros(grad_dim, dtype=np.float32)
         self._global_flat_grad = np.zeros(grad_dim, dtype=np.float32)
-        
+
         return
 
     def get_stepsize(self):
@@ -40,7 +43,7 @@ class MPISolver(Solver):
     def update_flatgrad(self, flat_grad, grad_scale=1.0):
         if self.iter % self.CHECK_SYNC_ITERS == 0:
             assert self.check_synced(), Logger.print('Network parameters desynchronized')
-        
+
         if grad_scale != 1.0:
             flat_grad *= grad_scale
 
@@ -73,7 +76,7 @@ class MPISolver(Solver):
 
     def _is_root(self):
         return MPIUtil.is_root_proc()
-    
+
     def _build_grad_feed(self, vars):
         self._grad_tf_list = []
         self._grad_buffers = []
@@ -85,7 +88,7 @@ class MPISolver(Solver):
             self._grad_tf_list.append(grad_tf)
 
         self._grad_feed = dict({g_tf: g for g_tf, g in zip(self._grad_tf_list, self._grad_buffers)})
-        
+
         return
 
     def _calc_grad_dim(self):

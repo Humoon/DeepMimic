@@ -4,7 +4,9 @@ import learning.tf_util as TFUtil
 from learning.rl_agent import RLAgent
 from util.logger import Logger
 
+
 class RLWorld(object):
+
     def __init__(self, env, arg_parser):
         TFUtil.disable_gpu()
 
@@ -15,12 +17,12 @@ class RLWorld(object):
         self.parse_args(arg_parser)
 
         self.build_agents()
-        
+
         return
 
     def get_enable_training(self):
         return self._enable_training
-    
+
     def set_enable_training(self, enable):
         self._enable_training = enable
         is_train_mode = self._enable_training
@@ -42,11 +44,11 @@ class RLWorld(object):
         return
 
     enable_training = property(get_enable_training, set_enable_training)
-    
+
     def parse_args(self, arg_parser):
         self.train_agents = self.arg_parser.parse_bools('train_agents')
         num_agents = self.env.get_num_agents()
-        assert(len(self.train_agents) == num_agents or len(self.train_agents) == 0)
+        assert (len(self.train_agents) == num_agents or len(self.train_agents) == 0)
 
         return
 
@@ -62,10 +64,10 @@ class RLWorld(object):
         Logger.print('Num Agents: {:d}'.format(num_agents))
 
         agent_files = self.arg_parser.parse_strings('agent_files')
-        assert(len(agent_files) == num_agents or len(agent_files) == 0)
+        assert (len(agent_files) == num_agents or len(agent_files) == 0)
 
         model_files = self.arg_parser.parse_strings('model_files')
-        assert(len(model_files) == num_agents or len(model_files) == 0)
+        assert (len(model_files) == num_agents or len(model_files) == 0)
 
         output_path = self.arg_parser.parse_string('output_path')
         int_output_path = self.arg_parser.parse_string('int_output_path')
@@ -102,7 +104,7 @@ class RLWorld(object):
         return
 
     def end_episode(self):
-        self._end_episode_agents();
+        self._end_episode_agents()
         return
 
     def _update_env(self, timestep):
@@ -138,6 +140,5 @@ class RLWorld(object):
         else:
             agent = AgentBuilder.build_agent(self, id, agent_file)
             assert (agent != None), 'Failed to build agent {:d} from: {}'.format(id, agent_file)
-        
+
         return agent
-        

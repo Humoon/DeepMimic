@@ -3,7 +3,9 @@ import copy
 from util.logger import Logger
 import util.math_util as MathUtil
 
+
 class ReplayBufferRandStorage(object):
+
     def __init__(self, buffer_size):
         assert buffer_size > 0
 
@@ -32,7 +34,7 @@ class ReplayBufferRandStorage(object):
 
             idx = self._request_idx(n)
             self._buffer[idx] = data
-                
+
             self._curr_size = min(self._curr_size + n, self._buffer_size)
             self._total_count += n
         return
@@ -44,10 +46,10 @@ class ReplayBufferRandStorage(object):
         self._curr_size = 0
         self._total_count = 0
         return
-    
+
     def get_buffer_size(self):
         return self._buffer_size
-    
+
     def get_current_size(self):
         return self._curr_size
 

@@ -1,0 +1,62 @@
+default: &default
+  avg:
+    - apm
+    - ep_reward
+    - net_goals
+    - left_score
+    - right_score
+    - ball_owned_steps
+    - middle_ball_steps
+    - enemy_ball_steps
+    - episode_step
+    - inf_server_response_time
+    - action_max_prb
+    - agent_sample_ratio
+    - predict_timeout
+    - docker_num_5m
+    - goal_rate
+    - pass_rate
+    - steal_ball
+    - loose_ball
+    - offside
+    - yellow_card
+    - mode_Normal
+    - mode_KickOff
+    - mode_GoalKick
+    - mode_FreeKick
+    - mode_Corner
+    - mode_ThrowIn
+    - mode_Penalty
+    - action_idle
+    - action_left
+    - action_top_left
+    - action_top
+    - action_top_right
+    - action_right
+    - action_bottom_right
+    - action_bottom
+    - action_bottom_left
+    - action_long_pass
+    - action_high_pass
+    - action_short_pass
+    - action_shot
+    - action_sprint
+    - action_release_direction
+    - action_release_sprint
+    - action_sliding
+    - action_dribble
+    - action_release_dribble
+  max:
+    - inf_server_response_time
+    - action_max_prb
+    - agent_sample_ratio
+  min:
+    - apm
+  per_min:
+    - env_steps
+
+development:
+  <<: *default
+
+production:
+  <<: *default

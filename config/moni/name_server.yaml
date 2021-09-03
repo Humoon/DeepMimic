@@ -1,0 +1,22 @@
+default: &default
+  avg:
+    - register
+    - register_gpu
+    - discovery_all
+    - discovery_inference
+    - discovery_train
+    - discovery_agent
+    - discovery_log_server
+    - discovery_pub_model_server
+    - discovery_all_gpu
+    - discovery_available_gpu
+    - all_keys
+    - get_task
+    - keep_alive
+
+development:
+  <<: *default
+
+
+production:
+  <<: *default

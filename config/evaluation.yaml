@@ -1,0 +1,11 @@
+default: &default
+  max_model_number: 500
+#  play_mode: "build-in-bot"
+  play_mode: "self-play"
+
+development:
+  <<: *default
+  max_model_number: 10
+
+production:
+  <<: *default

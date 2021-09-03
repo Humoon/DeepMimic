@@ -1,0 +1,13 @@
+default: &default
+  avg:
+    - model_delay_time  # training_server 发送最新参数 到 inf_server 加载最新参数 所用的时间
+    - inf_server_count
+    - inf_server_load_model_time  # inf_server 加载参数所用的时间
+  per_min:
+    - inf_server_receive_instance
+
+development:
+  <<: *default
+
+production:
+  <<: *default

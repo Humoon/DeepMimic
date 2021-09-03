@@ -1,0 +1,23 @@
+default: &default
+  avg:
+    - Q_value
+    - advantage_value
+    - entropy
+    - loss
+    - vf_loss
+    - entropy_loss
+    - policy_loss
+    - ratio_clipfrac
+    - ratio_low_bound_frac
+    - ratio_low_bound_value
+    - actor_global_norm
+  std:
+    - Q_value
+    - advantage_value
+
+development:
+  <<: *default
+
+
+production:
+  <<: *default

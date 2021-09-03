@@ -1,0 +1,17 @@
+default: &default
+  avg:
+    - net_goals
+    - win_rate
+    - elo_hard
+    - elo_training
+    - win_prob_hard
+    - win_prob_training
+    - draw_prob_hard
+    - draw_prob_training
+    - model_pool_length
+
+development:
+  <<: *default
+
+production:
+  <<: *default

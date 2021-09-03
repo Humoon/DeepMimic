@@ -35,6 +35,7 @@ def main():
 
     # Command line arguments
     args = sys.argv[1:]
+    # args = ['--arg_file', 'args/train_humanoid3d_dance_a_args.txt', '--num_workers', '1']
 
     world = build_world(args, enable_draw=False)
 

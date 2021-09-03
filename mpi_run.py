@@ -8,6 +8,7 @@ import DeepMimic_Optimizer
 def main():
     # Command line arguments
     args = sys.argv[1:]
+    # args = ['--arg_file', 'args/train_humanoid3d_dance_a_args.txt', '--num_workers', '1']
     arg_parser = ArgParser()
     arg_parser.load_args(args)
 

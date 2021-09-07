@@ -20,6 +20,8 @@
 .env
 .style.yapf
 
+log/
+summary_log/
 
 .vs/
 __pycache__/

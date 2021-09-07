@@ -3,11 +3,16 @@ import subprocess
 from util.arg_parser import ArgParser
 from util.logger import Logger
 import DeepMimic_Optimizer
+from newton import NewtonConfig
+
+# python3 -m pip install ../newton-core/
+# pip install --use-feature=in-tree-build ../newton-core/
 
 
 def main():
     # Command line arguments
     args = sys.argv[1:]
+    NewtonConfig.config_path = "data/config"
     # args = ['--arg_file', 'args/train_humanoid3d_dance_a_args.txt', '--num_workers', '1']
     arg_parser = ArgParser()
     arg_parser.load_args(args)

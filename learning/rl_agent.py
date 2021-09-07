@@ -1,3 +1,7 @@
+from logging import log
+from sys import implementation
+from loguru import logger
+from mpi4py.MPI import pickle
 import numpy as np
 import copy
 import os
@@ -13,6 +17,11 @@ from learning.replay_buffer import ReplayBuffer
 from util.logger import Logger
 import util.mpi_util as MPIUtil
 import util.math_util as MathUtil
+
+from newton import ZmqAdaptor
+from newton import LogServerAPI
+from newton import NameServerAPI
+from newton.common.utils import setup_logger
 
 
 class RLAgent(ABC):
@@ -79,6 +88,22 @@ class RLAgent(ABC):
         self.exp_params_end = ExpParams()
         self.exp_params_curr = ExpParams()
 
+        # net server
+        self.ns_api = NameServerAPI()
+
+        self._logger = setup_logger(log_file="./training_server_log")
+        self.zmq_adaptor = ZmqAdaptor(logger=self._logger)
+        address, port = self.ns_api.register(rtype="train_server", extra={"data_type": "train", "zmq_mode": "pull"})
+        self.ip = "%s_%d" % (address, port)
+        self._logger.info(f"begin listen {self.ip}")
+        self.zmq_adaptor.start({"mode": "pull", "host": "*", "port": port})
+
+        self.ls_api = LogServerAPI(self.ns_api, self.zmq_adaptor)
+        self.ls_api.connect()
+        self.ls_api.init_moni(["model", "training_server"])
+
+        self.next_check_stat_time = time.time() + 60
+
         self._load_params(json_data)
         self._build_replay_buffer(self.replay_buffer_size)
         self._build_normalizers()
@@ -123,6 +148,20 @@ class RLAgent(ABC):
         if self.need_new_action():
             self._update_new_action()
         return
+
+    def moni_check(self):
+        if time.time() > self.next_check_stat_time:
+            self.send_moni(msg_type="training_server")
+            self.next_check_stat_time += 5
+            self._logger.info("send moni to logserver.")
+
+    def send_moni(self, msg_type=None):
+        if msg_type == "training_server" or msg_type == "model":
+            result = self.ls_api.result(msg_type=msg_type)
+        else:
+            result = {}
+        if result != {}:
+            self.ls_api.send(pickle.dumps(result))
 
     def end_episode(self):
         if (self.path.pathlength() > 0):
@@ -515,7 +554,23 @@ class RLAgent(ABC):
                     self._log_exp_params()
 
                     self._update_iter(self.iter + 1)
-                    self._train_step()
+
+                    start_time = time.time()
+                    model_log_dict, train_log_dict = self._train_step()
+                    end_time = time.time()
+
+                    self.ls_api.record(model_log_dict, msg_type="model")
+                    self.send_moni(msg_type="model")
+
+                    train_log_dict.update({
+                        "training_steps_total": self.iter,
+                        "receive_instance_total": self.replay_buffer.get_current_size(),
+                        # f"receive_instance_rank_{self.rank}": receive_instance_num,
+                        # "data_efficiency": receive_instance_num / self.batch_size,
+                        "training_time": end_time - start_time,
+                    })
+
+                    self.ls_api.record(train_log_dict, msg_type="training_server")
 
                     Logger.print("Agent " + str(self.id))
                     self.logger.print_tabular()
@@ -523,6 +578,8 @@ class RLAgent(ABC):
 
                     if (self._enable_output() and curr_iter % self.int_output_iters == 0):
                         self.logger.dump_tabular()
+
+                    self.moni_check()
 
                 if (prev_iter // self.int_output_iters != self.iter // self.int_output_iters):
                     end_training = self.enable_testing()

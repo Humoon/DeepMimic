@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import copy as copy
 import tensorflow.compat.v1 as tf
@@ -121,21 +122,26 @@ class PPOAgent(PGAgent):
         if (actor_weight_decay != 0):
             self._actor_loss_tf += actor_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/actor')
 
+        # TODO(entropy loss)
+        # prob = tf.nn.softmax(self._sample_a_logp_tf, axis=-1)
+        # entropy = self._action_entropy(prob)
+        # self.entropy_loss = tf.reduce_mean(entropy)
+
         return
 
     def _build_solvers(self, json_data):
-        actor_stepsize = 0.001 if (self.ACTOR_STEPSIZE_KEY not in json_data) else json_data[self.ACTOR_STEPSIZE_KEY]
-        actor_momentum = 0.9 if (self.ACTOR_MOMENTUM_KEY not in json_data) else json_data[self.ACTOR_MOMENTUM_KEY]
-        critic_stepsize = 0.01 if (self.CRITIC_STEPSIZE_KEY not in json_data) else json_data[self.CRITIC_STEPSIZE_KEY]
-        critic_momentum = 0.9 if (self.CRITIC_MOMENTUM_KEY not in json_data) else json_data[self.CRITIC_MOMENTUM_KEY]
+        self.actor_stepsize = 0.001 if (self.ACTOR_STEPSIZE_KEY not in json_data) else json_data[self.ACTOR_STEPSIZE_KEY]
+        self.actor_momentum = 0.9 if (self.ACTOR_MOMENTUM_KEY not in json_data) else json_data[self.ACTOR_MOMENTUM_KEY]
+        self.critic_stepsize = 0.01 if (self.CRITIC_STEPSIZE_KEY not in json_data) else json_data[self.CRITIC_STEPSIZE_KEY]
+        self.critic_momentum = 0.9 if (self.CRITIC_MOMENTUM_KEY not in json_data) else json_data[self.CRITIC_MOMENTUM_KEY]
 
         critic_vars = self._tf_vars(self.MAIN_SCOPE + '/critic')
-        critic_opt = tf.train.MomentumOptimizer(learning_rate=critic_stepsize, momentum=critic_momentum)
+        critic_opt = tf.train.MomentumOptimizer(learning_rate=self.critic_stepsize, momentum=self.critic_momentum)
         self._critic_grad_tf = tf.gradients(self._critic_loss_tf, critic_vars)
         self._critic_solver = MPISolver(self.sess, critic_opt, critic_vars)
 
         actor_vars = self._tf_vars(self.MAIN_SCOPE + '/actor')
-        actor_opt = tf.train.MomentumOptimizer(learning_rate=actor_stepsize, momentum=actor_momentum)
+        actor_opt = tf.train.MomentumOptimizer(learning_rate=self.actor_stepsize, momentum=self.actor_momentum)
         self._actor_grad_tf = tf.gradients(self._actor_loss_tf, actor_vars)
         self._actor_solver = MPISolver(self.sess, actor_opt, actor_vars)
 
@@ -178,6 +184,7 @@ class PPOAgent(PGAgent):
         actor_loss = 0
         actor_clip_frac = 0
 
+        sgd_time = []
         for e in range(self.epochs):
             np.random.shuffle(valid_idx)
             np.random.shuffle(exp_idx)
@@ -199,14 +206,17 @@ class PPOAgent(PGAgent):
 
                 critic_s = self.replay_buffer.get('states', critic_batch)
                 critic_g = self.replay_buffer.get('goals', critic_batch) if self.has_goal() else None
-                curr_critic_loss = self._update_critic(critic_s, critic_g, critic_batch_vals)
 
                 actor_s = self.replay_buffer.get("states", actor_batch[:, 0])
                 actor_g = self.replay_buffer.get("goals", actor_batch[:, 0]) if self.has_goal() else None
                 actor_a = self.replay_buffer.get("actions", actor_batch[:, 0])
                 actor_logp = self.replay_buffer.get("logps", actor_batch[:, 0])
+
+                sgd_t = time.time()
+                curr_critic_loss = self._update_critic(critic_s, critic_g, critic_batch_vals)
                 curr_actor_loss, curr_actor_clip_frac = self._update_actor(actor_s, actor_g, actor_a, actor_logp,
                                                                            actor_batch_adv)
+                sgd_time.append(time.time() - sgd_t)
 
                 critic_loss += curr_critic_loss
                 actor_loss += np.abs(curr_actor_loss)
@@ -234,6 +244,24 @@ class PPOAgent(PGAgent):
         self.logger.log_tabular('Clip_Frac', actor_clip_frac)
         self.logger.log_tabular('Adv_Mean', adv_mean)
         self.logger.log_tabular('Adv_Std', adv_std)
+
+        model_log_dict = {
+            "policy_loss": actor_loss,
+            "vf_loss": critic_loss,
+            "ratio_clipfrac": actor_clip_frac,
+            "Q_value": np.mean(new_vals),
+            "advantage_value": adv_mean
+        }
+
+        train_log_dict = {
+            "sgd_time": np.mean(sgd_time),
+            "actor_learning_rate": self.actor_stepsize,
+            "actor_momentum": self.actor_momentum,
+            "critic_learning_rate": self.critic_stepsize,
+            "critic_momentum": self.critic_momentum
+        }
+
+        return model_log_dict, train_log_dict
 
     def _train(self):
         super()._train()
@@ -301,3 +329,10 @@ class PPOAgent(PGAgent):
         self._actor_solver.update(grads)
 
         return loss, clip_frac
+
+    # action entropy
+    def _action_entropy(self, p):
+        return -1 * tf.reduce_sum(tf.multiply(p, self.clip_log(p)), -1, keep_dims=True)
+
+    def clip_log(self, x, min=1e-4, max=1.0):
+        return tf.log(tf.clip_by_value(x, min, max))

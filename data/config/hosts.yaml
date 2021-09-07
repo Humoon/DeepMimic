@@ -1,0 +1,408 @@
+default: &default
+  rollout_worker:
+    - host_name: localhost
+      host_ip: 127.0.0.1
+
+development:
+  <<: *default
+  rollout_worker:
+    - host_name: localhost
+      host_ip: 0.0.0.0
+  gpu_server:
+    - host_name: localhost
+      host_ip: 0.0.0.0
+      gpu_num: 1
+
+production:
+  <<: *default
+
+  rollout_worker:
+#    - host_name: jssz-ai-newton-cpu-01
+#      host_ip: 10.70.218.18
+#    - host_name: jssz-ai-newton-cpu-02
+#      host_ip: 10.70.218.17
+#    - host_name: jssz-ai-newton-cpu-03
+#      host_ip: 10.70.218.16
+#    - host_name: jssz-ai-newton-cpu-04
+#      host_ip: &cpu-04 10.70.218.15
+#    - host_name: jssz-ai-newton-cpu-05
+#      host_ip: &cpu-05 10.70.218.14
+#    - host_name: jssz-ai-newton-cpu-06
+#      host_ip: &cpu-06 10.70.218.13
+#    - host_name: jssz-ai-newton-cpu-07
+#      host_ip: &cpu-07 10.70.218.12
+#    - host_name: jssz-ai-newton-cpu-08
+#      host_ip: &cpu-08 10.70.218.11
+#    - host_name: jssz-ai-newton-cpu-09
+#      host_ip: &cpu-09 10.70.217.34
+#    - host_name: jssz-ai-newton-cpu-10
+#      host_ip: &cpu-10 10.70.217.33
+#    - host_name: jssz-ai-newton-cpu-11
+#      host_ip: &cpu-11 10.70.217.32
+#    - host_name: jssz-ai-newton-cpu-12
+#      host_ip: &cpu-12 10.70.217.31
+#    - host_name: jssz-ai-newton-cpu-13
+#      host_ip: &cpu-13 10.70.217.30
+#    - host_name: jssz-ai-newton-cpu-14
+#      host_ip: &cpu-14 10.70.217.29
+#    - host_name: jssz-ai-newton-cpu-15
+#      host_ip: &cpu-15 10.70.217.28
+#    - host_name: jssz-ai-newton-cpu-16
+#      host_ip: &cpu-16 10.70.217.27
+#    - host_name: jssz-ai-newton-cpu-17
+#      host_ip: &cpu-17 10.70.217.26
+#    - host_name: jssz-ai-newton-cpu-18
+#      host_ip: &cpu-18 10.70.217.25
+#    - host_name: jssz-ai-newton-cpu-19
+#      host_ip: &cpu-19 10.70.217.24
+#    - host_name: jssz-ai-newton-cpu-20
+#      host_ip: &cpu-20 10.70.217.23
+#    - host_name: jssz-ai-newton-cpu-21
+#      host_ip: &cpu-21 10.70.217.22
+#    - host_name: jssz-ai-newton-cpu-22
+#      host_ip: &cpu-22 10.70.217.21
+#    - host_name: jssz-ai-newton-cpu-23
+#      host_ip: &cpu-23 10.70.217.20
+#    - host_name: jssz-ai-newton-cpu-24
+#      host_ip: &cpu-24 10.70.217.19
+#    - host_name: jssz-ai-newton-cpu-25
+#      host_ip: &cpu-25 10.70.217.18
+#    - host_name: jssz-ai-newton-cpu-26
+#      host_ip: &cpu-26 10.70.217.17
+#    - host_name: jssz-ai-newton-cpu-27
+#      host_ip: &cpu-27 10.70.217.16
+#    - host_name: jssz-ai-newton-cpu-28
+#      host_ip: &cpu-28 10.70.217.15
+#    - host_name: jssz-ai-newton-cpu-29
+#      host_ip: &cpu-29 10.70.217.14
+#    - host_name: jssz-ai-newton-cpu-30
+#      host_ip: &cpu-30 10.70.217.13
+#    - host_name: jssz-ai-newton-cpu-31
+#      host_ip: &cpu-31 10.70.217.12
+#    - host_name: jssz-ai-newton-cpu-32
+#      host_ip: &cpu-32 10.70.217.11
+#    - host_name: jssz-ai-newton-cpu-33
+#      host_ip: &cpu-33 10.70.216.34
+#    - host_name: jssz-ai-newton-cpu-34
+#      host_ip: &cpu-34 10.70.216.33
+#    - host_name: jssz-ai-newton-cpu-35
+#      host_ip: &cpu-35 10.70.216.32
+#    - host_name: jssz-ai-newton-cpu-36
+#      host_ip: &cpu-36 10.70.216.31
+#    - host_name: jssz-ai-newton-cpu-37
+#      host_ip: &cpu-37 10.70.216.30
+#    - host_name: jssz-ai-newton-cpu-38
+#      host_ip: &cpu-38 10.70.216.29
+#    - host_name: jssz-ai-newton-cpu-39
+#      host_ip: &cpu-39 10.70.216.28
+#    - host_name: jssz-ai-newton-cpu-40
+#      host_ip: &cpu-40 10.70.216.27
+    # - host_name: jssz-ai-newton-cpu-41
+    #   host_ip: &cpu-41 10.70.216.26
+    # - host_name: jssz-ai-newton-cpu-42
+    #   host_ip: &cpu-42 10.70.216.25
+    # - host_name: jssz-ai-newton-cpu-43
+    #   host_ip: &cpu-43 10.70.216.24
+    # - host_name: jssz-ai-newton-cpu-44
+    #   host_ip: &cpu-44 10.70.216.23
+    # - host_name: jssz-ai-newton-cpu-45
+    #   host_ip: &cpu-45 10.70.216.22
+    # - host_name: jssz-ai-newton-cpu-46
+    #   host_ip: &cpu-46 10.70.216.21
+    # - host_name: jssz-ai-newton-cpu-47
+    #   host_ip: &cpu-47 10.70.216.20
+    # - host_name: jssz-ai-newton-cpu-48
+    #   host_ip: &cpu-48 10.70.216.19
+    # - host_name: jssz-ai-newton-cpu-49
+    #   host_ip: &cpu-49 10.70.216.18
+    # - host_name: jssz-ai-newton-cpu-50
+    #   host_ip: &cpu-50 10.70.216.17
+    # - host_name: jssz-ai-newton-cpu-51
+    #   host_ip: &cpu-51 10.70.216.16
+    # - host_name: jssz-ai-newton-cpu-52
+    #   host_ip: &cpu-52 10.70.216.15
+    # - host_name: jssz-ai-newton-cpu-53
+    #   host_ip: &cpu-53 10.70.216.14
+    # - host_name: jssz-ai-newton-cpu-54
+    #   host_ip: &cpu-54 10.70.216.13
+    # - host_name: jssz-ai-newton-cpu-55
+    #   host_ip: &cpu-55 10.70.216.12
+    # - host_name: jssz-ai-newton-cpu-56
+    #   host_ip: &cpu-56 10.70.216.11
+    # - host_name: jssz-ai-newton-cpu-57
+    #   host_ip: &cpu-57 10.70.215.34
+    # - host_name: jssz-ai-newton-cpu-58
+    #   host_ip: &cpu-58 10.70.215.33
+    # - host_name: jssz-ai-newton-cpu-59
+    #   host_ip: &cpu-59 10.70.215.32
+    # - host_name: jssz-ai-newton-cpu-60
+    #   host_ip: &cpu-60 10.70.215.31
+    # - host_name: jssz-ai-newton-cpu-61
+    #   host_ip: &cpu-61 10.70.215.30
+    # - host_name: jssz-ai-newton-cpu-62
+    #   host_ip: &cpu-62 10.70.215.29
+    # - host_name: jssz-ai-newton-cpu-63
+    #   host_ip: &cpu-63 10.70.215.28
+    # - host_name: jssz-ai-newton-cpu-64
+    #   host_ip: &cpu-64 10.70.215.27
+    # - host_name: jssz-ai-newton-cpu-65
+    #   host_ip: &cpu-65 10.70.215.26
+    # - host_name: jssz-ai-newton-cpu-66
+    #   host_ip: &cpu-66 10.70.215.25
+#    - host_name: jssz-ai-newton-cpu-67
+#      host_ip: &cpu-67 10.70.215.24
+#    - host_name: jssz-ai-newton-cpu-68
+#      host_ip: &cpu-68 10.70.215.23
+#    - host_name: jssz-ai-newton-cpu-69
+#      host_ip: &cpu-69 10.70.215.22
+#    - host_name: jssz-ai-newton-cpu-70
+#      host_ip: &cpu-70 10.70.215.21
+   - host_name: jssz-ai-newton-cpu-71
+     host_ip: &cpu-71 10.70.215.20
+   - host_name: jssz-ai-newton-cpu-72
+     host_ip: &cpu-72 10.70.215.19
+   - host_name: jssz-ai-newton-cpu-73
+     host_ip: &cpu-73 10.70.215.18
+   - host_name: jssz-ai-newton-cpu-74
+     host_ip: &cpu-74 10.70.215.17
+   - host_name: jssz-ai-newton-cpu-75
+     host_ip: &cpu-75 10.70.215.16
+   - host_name: jssz-ai-newton-cpu-76
+     host_ip: &cpu-76 10.70.215.15
+   - host_name: jssz-ai-newton-cpu-77
+     host_ip: &cpu-77 10.70.215.14
+   - host_name: jssz-ai-newton-cpu-78
+     host_ip: &cpu-78 10.70.215.13
+   - host_name: jssz-ai-newton-cpu-79
+     host_ip: &cpu-79 10.70.215.12
+   - host_name: jssz-ai-newton-cpu-80
+     host_ip: &cpu-80 10.70.215.11
+   - host_name: jssz-ai-newton-cpu-81
+     host_ip: &cpu-81 10.70.218.27
+   - host_name: jssz-ai-newton-cpu-82
+     host_ip: &cpu-82 10.70.218.28
+   - host_name: jssz-ai-newton-cpu-83
+     host_ip: &cpu-83 10.70.218.29
+   - host_name: jssz-ai-newton-cpu-84
+     host_ip: &cpu-84 10.70.218.30
+   - host_name: jssz-ai-newton-cpu-85
+     host_ip: &cpu-85 10.70.218.31
+   - host_name: jssz-ai-newton-cpu-86
+     host_ip: &cpu-86 10.70.218.32
+   - host_name: jssz-ai-newton-cpu-87
+     host_ip: &cpu-87 10.70.218.33
+   - host_name: jssz-ai-newton-cpu-88
+     host_ip: &cpu-88 10.70.218.34
+   - host_name: jssz-ai-newton-cpu-89
+     host_ip: &cpu-89 10.70.219.11
+   - host_name: jssz-ai-newton-cpu-90
+     host_ip: &cpu-90 10.70.219.12
+   - host_name: jssz-ai-newton-cpu-91
+     host_ip: &cpu-91 10.70.219.13
+   - host_name: jssz-ai-newton-cpu-92
+     host_ip: &cpu-92 10.70.219.14
+   - host_name: jssz-ai-newton-cpu-93
+     host_ip: &cpu-93 10.70.218.19
+   - host_name: jssz-ai-newton-cpu-94
+     host_ip: &cpu-94 10.70.218.20
+   - host_name: jssz-ai-newton-cpu-95
+     host_ip: &cpu-95 10.70.218.21
+   - host_name: jssz-ai-newton-cpu-96
+     host_ip: &cpu-96 10.70.218.22
+   - host_name: jssz-ai-newton-cpu-97
+     host_ip: &cpu-97 10.70.218.23
+   - host_name: jssz-ai-newton-cpu-98
+     host_ip: &cpu-98 10.70.218.24
+   - host_name: jssz-ai-newton-cpu-99
+     host_ip: &cpu-99 10.70.218.25
+   - host_name: jssz-ai-newton-cpu-100
+     host_ip: &cpu-100 10.70.218.26
+#    - host_name: jssz-ai-newton-cpu-101
+#      host_ip: &cpu-101 10.71.188.30
+#    - host_name: jssz-ai-newton-cpu-102
+#      host_ip: &cpu-102 10.71.188.16
+#    - host_name: jssz-ai-newton-cpu-103
+#      host_ip: &cpu-103 10.71.188.17
+#    - host_name: jssz-ai-newton-cpu-104
+#      host_ip: &cpu-104 10.71.188.18
+#    - host_name: jssz-ai-newton-cpu-105
+#      host_ip: &cpu-105 10.71.188.19
+#    - host_name: jssz-ai-newton-cpu-106
+#      host_ip: &cpu-106 10.71.188.20
+#    - host_name: jssz-ai-newton-cpu-107
+#      host_ip: &cpu-107 10.71.188.31
+#    - host_name: jssz-ai-newton-cpu-108
+#      host_ip: &cpu-108 10.71.188.32
+#    - host_name: jssz-ai-newton-cpu-109
+#      host_ip: &cpu-109 10.71.188.33
+#    - host_name: jssz-ai-newton-cpu-110
+#      host_ip: &cpu-110 10.71.188.34
+#    - host_name: jssz-ai-newton-cpu-111
+#      host_ip: &cpu-111 10.71.188.35
+#    - host_name: jssz-ai-newton-cpu-112
+#      host_ip: &cpu-112 10.71.189.11
+#    - host_name: jssz-ai-newton-cpu-113
+#      host_ip: &cpu-113 10.71.189.12
+#    - host_name: jssz-ai-newton-cpu-114
+#      host_ip: &cpu-114 10.71.189.13
+#    - host_name: jssz-ai-newton-cpu-115
+#      host_ip: &cpu-115 10.71.189.14
+#    - host_name: jssz-ai-newton-cpu-116
+#      host_ip: &cpu-116 10.71.189.15
+#    - host_name: jssz-ai-newton-cpu-117
+#      host_ip: &cpu-117 10.71.189.26
+#    - host_name: jssz-ai-newton-cpu-118
+#      host_ip: &cpu-118 10.71.189.27
+#    - host_name: jssz-ai-newton-cpu-119
+#      host_ip: &cpu-119 10.71.189.28
+#    - host_name: jssz-ai-newton-cpu-120
+#      host_ip: &cpu-120 10.71.189.29
+#    - host_name: jssz-ai-newton-cpu-121
+#      host_ip: &cpu-121 10.71.189.30
+#    - host_name: jssz-ai-newton-cpu-122
+#      host_ip: &cpu-122 10.71.190.11
+#    - host_name: jssz-ai-newton-cpu-123
+#      host_ip: &cpu-123 10.71.190.12
+#    - host_name: jssz-ai-newton-cpu-124
+#      host_ip: &cpu-124 10.71.190.13
+#    - host_name: jssz-ai-newton-cpu-125
+#      host_ip: &cpu-125 10.71.190.14
+#    - host_name: jssz-ai-newton-cpu-126
+#      host_ip: &cpu-126 10.71.190.15
+#    - host_name: jssz-ai-newton-cpu-127
+#      host_ip: &cpu-127 10.71.190.26
+#    - host_name: jssz-ai-newton-cpu-128
+#      host_ip: &cpu-128 10.71.190.27
+#    - host_name: jssz-ai-newton-cpu-129
+#      host_ip: &cpu-129 10.71.190.28
+#    - host_name: jssz-ai-newton-cpu-130
+#      host_ip: &cpu-130 10.71.190.29
+#    - host_name: jssz-ai-newton-cpu-131
+#      host_ip: &cpu-131 10.71.190.30
+#    - host_name: jssz-ai-newton-cpu-132
+#      host_ip: &cpu-132 10.71.191.11
+#    - host_name: jssz-ai-newton-cpu-133
+#      host_ip: &cpu-133 10.71.191.12
+#    - host_name: jssz-ai-newton-cpu-134
+#      host_ip: &cpu-134 10.71.191.13
+#    - host_name: jssz-ai-newton-cpu-135
+#      host_ip: &cpu-135 10.71.191.14
+#    - host_name: jssz-ai-newton-cpu-136
+#      host_ip: &cpu-136 10.71.191.15
+#    - host_name: jssz-ai-newton-cpu-137
+#      host_ip: &cpu-137 10.71.191.26
+#    - host_name: jssz-ai-newton-cpu-138
+#      host_ip: &cpu-138 10.71.191.27
+#    - host_name: jssz-ai-newton-cpu-139
+#      host_ip: &cpu-139 10.71.191.28
+#    - host_name: jssz-ai-newton-cpu-140
+#      host_ip: &cpu-140 10.71.191.29
+#    - host_name: jssz-ai-newton-cpu-141
+#      host_ip: &cpu-141 10.71.191.30
+#    - host_name: jssz-ai-newton-cpu-142
+#      host_ip: &cpu-142 10.71.192.11
+#    - host_name: jssz-ai-newton-cpu-143
+#      host_ip: &cpu-143 10.71.192.12
+#    - host_name: jssz-ai-newton-cpu-144
+#      host_ip: &cpu-144 10.71.192.13
+#    - host_name: jssz-ai-newton-cpu-145
+#      host_ip: &cpu-145 10.71.192.14
+#    - host_name: jssz-ai-newton-cpu-146
+#      host_ip: &cpu-146 10.71.192.15
+#    - host_name: jssz-ai-newton-cpu-147
+#      host_ip: &cpu-147 10.71.192.26
+#    - host_name: jssz-ai-newton-cpu-148
+#      host_ip: &cpu-148 10.71.192.27
+#    - host_name: jssz-ai-newton-cpu-149
+#      host_ip: &cpu-149 10.71.192.28
+#    - host_name: jssz-ai-newton-cpu-150
+#      host_ip: &cpu-150 10.71.192.29
+#    - host_name: jssz-ai-newton-cpu-151
+#      host_ip: &cpu-151 10.71.192.30
+#    - host_name: jssz-ai-newton-cpu-152
+#      host_ip: &cpu-152 10.71.193.11
+#    - host_name: jssz-ai-newton-cpu-153
+#      host_ip: &cpu-153 10.71.193.12
+#    - host_name: jssz-ai-newton-cpu-154
+#      host_ip: &cpu-154 10.71.193.13
+#    - host_name: jssz-ai-newton-cpu-155
+#      host_ip: &cpu-155 10.71.193.14
+#    - host_name: jssz-ai-newton-cpu-156
+#      host_ip: &cpu-156 10.71.193.15
+#    - host_name: jssz-ai-newton-cpu-157
+#      host_ip: &cpu-157 10.71.193.26
+#    - host_name: jssz-ai-newton-cpu-158
+#      host_ip: &cpu-158 10.71.193.27
+#    - host_name: jssz-ai-newton-cpu-159
+#      host_ip: &cpu-159 10.71.193.28
+#    - host_name: jssz-ai-newton-cpu-160
+#      host_ip: &cpu-160 10.71.193.29
+
+  gpu_server:
+   - host_name: jssz-ai-newton-cpu-71
+     host_ip: &cpu-71 10.70.215.20
+   - host_name: jssz-ai-newton-cpu-72
+     host_ip: &cpu-72 10.70.215.19
+   - host_name: jssz-ai-newton-cpu-73
+     host_ip: &cpu-73 10.70.215.18
+   - host_name: jssz-ai-newton-cpu-74
+     host_ip: &cpu-74 10.70.215.17
+   - host_name: jssz-ai-newton-cpu-75
+     host_ip: &cpu-75 10.70.215.16
+#    - host_name: jssz-ai-newton-gpu-01
+#      host_ip: &gpu-01 10.70.234.21
+#      gpu_num: 8
+#    - host_name: jssz-ai-newton-gpu-02
+#      host_ip: &gpu-02 10.70.238.34
+#      gpu_num: 8
+    # - host_name: jssz-ai-newton-gpu-03
+    #   host_ip: &gpu-03 10.70.234.33
+    #   gpu_num: 8
+    # - host_name: jssz-ai-newton-gpu-04
+    #   host_ip: &gpu-04 10.70.235.21
+    #   gpu_num: 6
+   - host_name: jssz-ai-newton-gpu-05
+     host_ip: &gpu-05 10.70.235.33
+     gpu_num: 8
+   - host_name: jssz-ai-newton-gpu-06
+     host_ip: &gpu-06 10.70.236.21
+     gpu_num: 8
+#    - host_name: jssz-ai-newton-gpu-07
+#      host_ip: &gpu-07 10.70.236.34
+#      gpu_num: 8
+#    - host_name: jssz-ai-newton-gpu-08
+#      host_ip: &gpu-08 10.70.237.22
+#      gpu_num: 8
+#    - host_name: jssz-ai-newton-gpu-09
+#      host_ip: &gpu-09 10.70.237.34
+#      gpu_num: 8
+#    - host_name: jssz-ai-newton-gpu-10
+#      host_ip: &gpu-10 10.70.238.22
+#      gpu_num: 8
+
+  name_server:
+    host: *gpu-05
+
+  training_server:
+    host:
+      - *gpu-05
+      - *gpu-06
+
+  inference_server:
+    # - ip: *cpu-67
+    #   gpu: 0
+    #   cpu: 16
+    # - ip: *cpu-68
+    #   gpu: 0
+    #   cpu: 16
+    # - ip: *cpu-69
+    #   gpu: 0
+    #   cpu: 16
+    # - ip: *cpu-70
+    #   gpu: 0
+    #   cpu: 16
+
+  log_server:
+    host: *gpu-05
+
+  evaluation_server: *gpu-05

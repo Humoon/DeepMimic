@@ -1,0 +1,219 @@
+default: &default
+  avg:
+    - tag: apm
+      output_freq: 10000
+    - tag: ep_reward
+      output_freq: 50
+    - tag: net_goals
+      output_freq: 10000
+    - tag: left_score
+      output_freq: 10000
+    - tag: right_score
+      output_freq: 10000
+    - tag: ball_owned_steps
+      output_freq: 10000
+    - tag: middle_ball_steps
+      output_freq: 10000
+    - tag: enemy_ball_steps
+      output_freq: 10000
+    - tag: episode_step
+      output_freq: 50
+    - tag: inf_server_response_time
+      output_freq: 10000
+    - tag: action_max_prb
+      output_freq: 50
+    - tag: agent_sample_ratio
+      output_freq: 50
+    - tag: predict_timeout
+      output_freq: 10000
+    - tag: docker_num_5m
+      output_freq: 10000
+    - tag: goal_rate
+      output_freq: 10000
+    - tag: pass_rate
+      output_freq: 10000
+    - tag: steal_ball
+      output_freq: 10000
+    - tag: loose_ball
+      output_freq: 10000
+    - tag: offside
+      output_freq: 10000
+    - tag: yellow_card
+      output_freq: 10000
+    - tag: mode_Normal
+      output_freq: 50
+    - tag: mode_KickOff
+      output_freq: 50
+    - tag: mode_GoalKick
+      output_freq: 50
+    - tag: mode_FreeKick
+      output_freq: 50
+    - tag: mode_Corner
+      output_freq: 50
+    - tag: mode_ThrowIn
+      output_freq: 50
+    - tag: mode_Penalty
+      output_freq: 50
+    - tag: action_idle
+      output_freq: 50
+    - tag: action_left
+      output_freq: 50
+    - tag: action_top_left
+      output_freq: 50
+    - tag: action_top
+      output_freq: 50
+    - tag: action_top_right
+      output_freq: 50
+    - tag: action_right
+      output_freq: 50
+    - tag: action_bottom_right
+      output_freq: 50
+    - tag: action_bottom
+      output_freq: 50
+    - tag: action_bottom_left
+      output_freq: 50
+    - tag: action_long_pass
+      output_freq: 50
+    - tag: action_high_pass
+      output_freq: 50
+    - tag: action_short_pass
+      output_freq: 50
+    - tag: action_shot
+      output_freq: 50
+    - tag: action_sprint
+      output_freq: 50
+    - tag: action_release_direction
+      output_freq: 50
+    - tag: action_release_sprint
+      output_freq: 50
+    - tag: action_sliding
+      output_freq: 50
+    - tag: action_dribble
+      output_freq: 50
+    - tag: action_release_dribble
+      output_freq: 50
+  max:
+    - tag: inf_server_response_time
+      output_freq: 10000
+    - tag: action_max_prb
+      output_freq: 50
+    - tag: agent_sample_ratio
+      output_freq: 50
+  min:
+    - tag: apm
+      output_freq: 10000
+  per_min:
+    - tag: env_steps
+      output_freq: 10000
+
+development:
+  <<: *default
+  avg:
+    - tag: apm
+      output_freq: 500
+    - tag: ep_reward
+      output_freq: 5
+    - tag: net_goals
+      output_freq: 500
+    - tag: left_score
+      output_freq: 500
+    - tag: right_score
+      output_freq: 500
+    - tag: ball_owned_steps
+      output_freq: 500
+    - tag: middle_ball_steps
+      output_freq: 500
+    - tag: enemy_ball_steps
+      output_freq: 500
+    - tag: episode_step
+      output_freq: 5
+    - tag: inf_server_response_time
+      output_freq: 500
+    - tag: action_max_prb
+      output_freq: 5
+    - tag: agent_sample_ratio
+      output_freq: 5
+    - tag: predict_timeout
+      output_freq: 500
+    - tag: docker_num_5m
+      output_freq: 500
+    - tag: goal_rate
+      output_freq: 500
+    - tag: pass_rate
+      output_freq: 500
+    - tag: steal_ball
+      output_freq: 500
+    - tag: loose_ball
+      output_freq: 500
+    - tag: offside
+      output_freq: 500
+    - tag: yellow_card
+      output_freq: 500
+    - tag: mode_Normal
+      output_freq: 5
+    - tag: mode_KickOff
+      output_freq: 5
+    - tag: mode_GoalKick
+      output_freq: 5
+    - tag: mode_FreeKick
+      output_freq: 5
+    - tag: mode_Corner
+      output_freq: 5
+    - tag: mode_ThrowIn
+      output_freq: 5
+    - tag: mode_Penalty
+      output_freq: 5
+    - tag: action_idle
+      output_freq: 5
+    - tag: action_left
+      output_freq: 5
+    - tag: action_top_left
+      output_freq: 5
+    - tag: action_top
+      output_freq: 5
+    - tag: action_top_right
+      output_freq: 5
+    - tag: action_right
+      output_freq: 5
+    - tag: action_bottom_right
+      output_freq: 5
+    - tag: action_bottom
+      output_freq: 5
+    - tag: action_bottom_left
+      output_freq: 5
+    - tag: action_long_pass
+      output_freq: 5
+    - tag: action_high_pass
+      output_freq: 5
+    - tag: action_short_pass
+      output_freq: 5
+    - tag: action_shot
+      output_freq: 5
+    - tag: action_sprint
+      output_freq: 5
+    - tag: action_release_direction
+      output_freq: 5
+    - tag: action_release_sprint
+      output_freq: 5
+    - tag: action_sliding
+      output_freq: 5
+    - tag: action_dribble
+      output_freq: 5
+    - tag: action_release_dribble
+      output_freq: 5
+  max:
+    - tag: inf_server_response_time
+      output_freq: 500
+    - tag: action_max_prb
+      output_freq: 5
+    - tag: agent_sample_ratio
+      output_freq: 5
+  min:
+    - tag: apm
+      output_freq: 500
+  per_min:
+    - tag: env_steps
+      output_freq: 500
+
+production:
+  <<: *default

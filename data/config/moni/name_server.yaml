@@ -1,0 +1,35 @@
+default: &default
+  avg:
+    - tag: register
+      output_freq: 1
+    - tag: register_gpu
+      output_freq: 1
+    - tag: discovery_all
+      output_freq: 1
+    - tag: discovery_inference
+      output_freq: 1
+    - tag: discovery_train
+      output_freq: 1
+    - tag: discovery_agent
+      output_freq: 1
+    - tag: discovery_log_server
+      output_freq: 1
+    - tag: discovery_pub_model_server
+      output_freq: 1
+    - tag: discovery_all_gpu
+      output_freq: 1
+    - tag: discovery_available_gpu
+      output_freq: 1
+    - tag: all_keys
+      output_freq: 1
+    - tag: get_task
+      output_freq: 1
+    - tag: keep_alive
+      output_freq: 1
+
+development:
+  <<: *default
+
+
+production:
+  <<: *default

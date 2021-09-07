@@ -1,0 +1,177 @@
+default: &default
+  avg:
+    - tag: learning_rate
+      output_freq: 10
+    - tag: actor_learning_rate
+      output_freq: 10
+    - tag: actor_momentum
+      output_freq: 10
+    - tag: critic_learning_rate
+      output_freq: 10
+    - tag: critic_momentum
+      output_freq: 10
+    - tag: action_entropy_parameter
+      output_freq: 10
+    - tag: data_efficiency
+      output_freq: 10
+    - tag: policy_different
+      output_freq: 10
+    - tag: training_time
+      output_freq: 10
+    - tag: sgd_time
+      output_freq: 10
+    - tag: slice_time
+      output_freq: 10
+  max:
+    - tag: sgd_time
+      output_freq: 10
+  min:
+    - tag: sgd_time
+      output_freq: 10
+  total:
+    - tag: training_steps
+      output_freq: 10
+  per_min:
+    - tag: sgd_round
+      output_freq: 10
+    - tag: receive_instance_total
+      output_freq: 10
+    - tag: receive_instance_rank_0
+      output_freq: 10
+    - tag: receive_instance_rank_1
+      output_freq: 10
+    - tag: receive_instance_rank_2
+      output_freq: 10
+    - tag: receive_instance_rank_3
+      output_freq: 10
+    - tag: receive_instance_rank_4
+      output_freq: 10
+    - tag: receive_instance_rank_5
+      output_freq: 10
+    - tag: receive_instance_rank_6
+      output_freq: 10
+    - tag: receive_instance_rank_7
+      output_freq: 10
+    - tag: receive_instance_rank_8
+      output_freq: 10
+    - tag: receive_instance_rank_9
+      output_freq: 10
+    - tag: receive_instance_rank_10
+      output_freq: 10
+    - tag: receive_instance_rank_11
+      output_freq: 10
+    - tag: receive_instance_rank_12
+      output_freq: 10
+    - tag: receive_instance_rank_13
+      output_freq: 10
+    - tag: receive_instance_rank_14
+      output_freq: 10
+    - tag: receive_instance_rank_15
+      output_freq: 10
+    - tag: receive_instance_rank_16
+      output_freq: 10
+    - tag: receive_instance_rank_17
+      output_freq: 10
+    - tag: receive_instance_rank_18
+      output_freq: 10
+    - tag: receive_instance_rank_19
+      output_freq: 10
+    - tag: receive_instance_rank_20
+      output_freq: 10
+    - tag: receive_instance_rank_21
+      output_freq: 10
+    - tag: receive_instance_rank_22
+      output_freq: 10
+    - tag: receive_instance_rank_23
+      output_freq: 10
+
+development:
+  <<: *default
+  avg:
+    - tag: learning_rate
+      output_freq: 5
+    - tag: actor_learning_rate
+      output_freq: 5
+    - tag: actor_momentum
+      output_freq: 5
+    - tag: critic_learning_rate
+      output_freq: 5
+    - tag: critic_momentum
+      output_freq: 5
+    - tag: action_entropy_parameter
+      output_freq: 5
+    - tag: data_efficiency
+      output_freq: 5
+    - tag: policy_different
+      output_freq: 5
+    - tag: training_time
+      output_freq: 5
+    - tag: sgd_time
+      output_freq: 5
+    - tag: slice_time
+      output_freq: 5
+  max:
+    - tag: sgd_time
+      output_freq: 5
+  min:
+    - tag: sgd_time
+      output_freq: 5
+  total:
+    - tag: training_steps
+      output_freq: 5
+  per_min:
+    - tag: sgd_round
+      output_freq: 5
+    - tag: receive_instance_total
+      output_freq: 5
+    - tag: receive_instance_rank_0
+      output_freq: 5
+    - tag: receive_instance_rank_1
+      output_freq: 5
+    - tag: receive_instance_rank_2
+      output_freq: 5
+    - tag: receive_instance_rank_3
+      output_freq: 5
+    - tag: receive_instance_rank_4
+      output_freq: 5
+    - tag: receive_instance_rank_5
+      output_freq: 5
+    - tag: receive_instance_rank_6
+      output_freq: 5
+    - tag: receive_instance_rank_7
+      output_freq: 5
+    - tag: receive_instance_rank_8
+      output_freq: 5
+    - tag: receive_instance_rank_9
+      output_freq: 5
+    - tag: receive_instance_rank_10
+      output_freq: 5
+    - tag: receive_instance_rank_11
+      output_freq: 5
+    - tag: receive_instance_rank_12
+      output_freq: 5
+    - tag: receive_instance_rank_13
+      output_freq: 5
+    - tag: receive_instance_rank_14
+      output_freq: 5
+    - tag: receive_instance_rank_15
+      output_freq: 5
+    - tag: receive_instance_rank_16
+      output_freq: 5
+    - tag: receive_instance_rank_17
+      output_freq: 5
+    - tag: receive_instance_rank_18
+      output_freq: 5
+    - tag: receive_instance_rank_19
+      output_freq: 5
+    - tag: receive_instance_rank_20
+      output_freq: 5
+    - tag: receive_instance_rank_21
+      output_freq: 5
+    - tag: receive_instance_rank_22
+      output_freq: 5
+    - tag: receive_instance_rank_23
+      output_freq: 5
+
+production:
+  <<: *default

@@ -16,7 +16,7 @@
 *.o
 *.cxx
 *.so
-.vscode/
+.vscode
 .env
 .style.yapf
 *.ckpt.*
@@ -24,6 +24,11 @@
 log/
 output/
 summary_log/
+
+data/policies/dog3d/*
+data/policies/dog3d_amp/*
+data/policies/dog3d/humanoid3d/*
+data/policies/dog3d/humanoid3d_amp/*
 
 .vs/
 __pycache__/
@@ -36,7 +41,6 @@ lib/
 external/
 Backup/
 data/intermediate/
-data/policies/
 DeepMimicCore/objs/
 
 DeepMimicCore/DeepMimicCore.py

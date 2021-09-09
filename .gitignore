@@ -19,8 +19,10 @@
 .vscode/
 .env
 .style.yapf
+*.ckpt.*
 
 log/
+output/
 summary_log/
 
 .vs/
@@ -34,6 +36,7 @@ lib/
 external/
 Backup/
 data/intermediate/
+data/policies/
 DeepMimicCore/objs/
 
 DeepMimicCore/DeepMimicCore.py

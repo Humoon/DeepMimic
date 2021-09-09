@@ -22,6 +22,8 @@ default: &default
       output_freq: 10
     - tag: slice_time
       output_freq: 10
+    - tag: training_size_per_iter
+      output_freq: 10
   max:
     - tag: sgd_time
       output_freq: 10
@@ -110,6 +112,8 @@ development:
       output_freq: 5
     - tag: slice_time
       output_freq: 5
+    - tag: training_size_per_iter
+      output_freq: 10
   max:
     - tag: sgd_time
       output_freq: 5

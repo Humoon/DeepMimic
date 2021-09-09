@@ -46,7 +46,7 @@ default: &default
   env_name: "deepmimic"
   football_model: "football_ppo_mlp"
 
-  exp_name: "humanoid3d_dance_a"
+  exp_name: "action"
 
 # tensorboard log name will be: log_ + time_ + env_name_ + exp_name
 

@@ -13,12 +13,14 @@ class TFAgent(RLAgent):
     RESOURCE_SCOPE = 'resource'
     SOLVER_SCOPE = 'solvers'
 
-    def __init__(self, world, id, json_data):
+    def __init__(self, world, id, json_data, motion_name=None):
         self.tf_scope = 'agent'
+        self.motion_name = motion_name
+
         self.graph = tf.Graph()
         self.sess = tf.Session(graph=self.graph)
 
-        super().__init__(world, id, json_data)
+        super().__init__(world, id, json_data, motion_name)
         self._build_graph(json_data)
         self._init_normalizers()
         return
@@ -45,7 +47,10 @@ class TFAgent(RLAgent):
 
     def _get_output_path(self):
         assert (self.output_dir != '')
-        file_path = self.output_dir + '/agent' + str(self.id) + '_model.ckpt'
+        if self.motion_name != None:
+            file_path = self.output_dir + '/agent' + str(self.id) + '_' + self.motion_name + '_model.ckpt'
+        else:
+            file_path = self.output_dir + '/agent' + str(self.id) + '_model.ckpt'
         return file_path
 
     def _get_int_output_path(self):
@@ -127,7 +132,7 @@ class TFAgent(RLAgent):
 
     def _build_saver(self):
         vars = self._get_saver_vars()
-        self.saver = tf.train.Saver(vars, max_to_keep=0)
+        self.saver = tf.train.Saver(vars, max_to_keep=3)
         return
 
     def _get_saver_vars(self):

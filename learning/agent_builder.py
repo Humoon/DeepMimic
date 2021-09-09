@@ -6,7 +6,7 @@ from learning.amp_agent import AMPAgent
 AGENT_TYPE_KEY = "AgentType"
 
 
-def build_agent(world, id, file):
+def build_agent(world, id, file, motion_name=None):
     agent = None
     with open(file) as data_file:
         json_data = json.load(data_file)
@@ -15,7 +15,7 @@ def build_agent(world, id, file):
         agent_type = json_data[AGENT_TYPE_KEY]
 
         if (agent_type == PPOAgent.NAME):
-            agent = PPOAgent(world, id, json_data)
+            agent = PPOAgent(world, id, json_data, motion_name)
         elif (agent_type == AMPAgent.NAME):
             agent = AMPAgent(world, id, json_data)
         else:

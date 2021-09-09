@@ -48,7 +48,7 @@ class RLAgent(ABC):
     EXP_PARAM_BEG_KEY = "ExpParamsBeg"
     EXP_PARAM_END_KEY = "ExpParamsEnd"
 
-    def __init__(self, world, id, json_data):
+    def __init__(self, world, id, json_data, motion_name=None):
         self.world = world
         self.id = id
         self.logger = Logger()
@@ -564,7 +564,6 @@ class RLAgent(ABC):
 
                     train_log_dict.update({
                         "training_steps_total": self.iter,
-                        "receive_instance_total": self.replay_buffer.get_current_size(),
                         # f"receive_instance_rank_{self.rank}": receive_instance_num,
                         # "data_efficiency": receive_instance_num / self.batch_size,
                         "training_time": end_time - start_time,

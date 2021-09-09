@@ -38,9 +38,9 @@ class PGAgent(TFAgent):
 
     EXP_ACTION_FLAG = 1 << 0
 
-    def __init__(self, world, id, json_data):
+    def __init__(self, world, id, json_data, motion_name=None):
         self._exp_action = False
-        super().__init__(world, id, json_data)
+        super().__init__(world, id, json_data, motion_name)
         return
 
     def reset(self):

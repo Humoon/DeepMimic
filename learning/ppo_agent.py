@@ -29,8 +29,8 @@ class PPOAgent(PGAgent):
 
     ADV_EPS = 1e-5
 
-    def __init__(self, world, id, json_data):
-        super().__init__(world, id, json_data)
+    def __init__(self, world, id, json_data, motion_name=None):
+        super().__init__(world, id, json_data, motion_name)
         return
 
     def _load_params(self, json_data):
@@ -121,11 +121,6 @@ class PPOAgent(PGAgent):
 
         if (actor_weight_decay != 0):
             self._actor_loss_tf += actor_weight_decay * self._weight_decay_loss(self.MAIN_SCOPE + '/actor')
-
-        # TODO(entropy loss)
-        # prob = tf.nn.softmax(self._sample_a_logp_tf, axis=-1)
-        # entropy = self._action_entropy(prob)
-        # self.entropy_loss = tf.reduce_mean(entropy)
 
         return
 
@@ -254,6 +249,7 @@ class PPOAgent(PGAgent):
         }
 
         train_log_dict = {
+            "training_size_per_iter:": end_idx - start_idx,
             "sgd_time": np.mean(sgd_time),
             "actor_learning_rate": self.actor_stepsize,
             "actor_momentum": self.actor_momentum,
@@ -329,10 +325,3 @@ class PPOAgent(PGAgent):
         self._actor_solver.update(grads)
 
         return loss, clip_frac
-
-    # action entropy
-    def _action_entropy(self, p):
-        return -1 * tf.reduce_sum(tf.multiply(p, self.clip_log(p)), -1, keep_dims=True)
-
-    def clip_log(self, x, min=1e-4, max=1.0):
-        return tf.log(tf.clip_by_value(x, min, max))

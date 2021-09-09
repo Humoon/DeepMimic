@@ -1,3 +1,4 @@
+import newton
 import numpy as np
 import sys
 import random
@@ -12,6 +13,8 @@ from util.arg_parser import ArgParser
 from util.logger import Logger
 import util.mpi_util as MPIUtil
 import util.util as Util
+
+from newton import NewtonConfig
 
 # Dimensions of the window we are drawing into.
 win_width = 800
@@ -325,6 +328,7 @@ def main():
     global args
 
     # Command line arguments
+    NewtonConfig.config_path = "data/config"
     args = sys.argv[1:]
 
     init_draw()

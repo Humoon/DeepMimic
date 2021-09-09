@@ -176,6 +176,21 @@ Pretrained AMP models can be evaluated using:
 python DeepMimic.py --arg_file args/run_amp_target_humanoid3d_locomotion_args.txt
 ```
 
+## newton-deepmimic
+
+build the newton dependency:
+
+``python3 -m pip install ../newton-core/``
+
+start training:
+
+Frist, start a **NameServer** and **LogServer**, where the configuration yaml files are in ``data/config``, then start the traning server.
+```
+python3 run_name_server.py
+python3 run_log_server.py
+python3 mpi_run.py --arg_file args/train_humanoid3d_spinkick_args.txt --num_workers 16
+```
+
 ## Interface
 - the plot on the top-right shows the predictions of the value function
 - right click and drag will pan the camera

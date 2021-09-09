@@ -1,0 +1,35 @@
+default: &default
+  avg:
+    - tag: Q_value
+      output_freq: 5
+    - tag: advantage_value
+      output_freq: 5
+    - tag: entropy
+      output_freq: 5
+    - tag: loss
+      output_freq: 5
+    - tag: vf_loss
+      output_freq: 5
+    - tag: entropy_loss
+      output_freq: 5
+    - tag: policy_loss
+      output_freq: 5
+    - tag: ratio_clipfrac
+      output_freq: 5
+    - tag: ratio_low_bound_frac
+      output_freq: 5
+    - tag: ratio_low_bound_value
+      output_freq: 5
+    - tag: actor_global_norm
+      output_freq: 5
+  std:
+    - tag: Q_value
+      output_freq: 5
+    - tag: advantage_value
+      output_freq: 5
+
+development:
+  <<: *default
+
+production:
+  <<: *default

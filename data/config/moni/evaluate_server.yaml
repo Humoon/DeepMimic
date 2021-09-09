@@ -1,0 +1,26 @@
+default: &default
+  avg:
+    - tag: net_goals
+      output_freq: 1
+    - tag: win_rate
+      output_freq: 5
+    - tag: elo_hard
+      output_freq: 5
+    - tag: elo_training
+      output_freq: 5
+    - tag: win_prob_hard
+      output_freq: 5
+    - tag: win_prob_training
+      output_freq: 5
+    - tag: draw_prob_hard
+      output_freq: 5
+    - tag: draw_prob_training
+      output_freq: 5
+    - tag: model_pool_length
+      output_freq: 5
+
+development:
+  <<: *default
+
+production:
+  <<: *default

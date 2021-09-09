@@ -1,0 +1,10 @@
+default: &default
+  host: 10.70.234.33
+  port: 6759
+
+development:
+  <<: *default
+  host: 0.0.0.0
+
+production:
+  <<: *default

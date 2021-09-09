@@ -69,12 +69,18 @@ class RLWorld(object):
         model_files = self.arg_parser.parse_strings('model_files')
         assert (len(model_files) == num_agents or len(model_files) == 0)
 
+        motion_files = self.arg_parser.parse_strings('motion_file')
+        assert (len(motion_files) == num_agents or len(motion_files) == 0)
+        motion_name = None
+        if len(motion_files) != 0:
+            motion_name = motion_files[0].split('.')[0].split('/')[-1]
+
         output_path = self.arg_parser.parse_string('output_path')
         int_output_path = self.arg_parser.parse_string('int_output_path')
 
         for i in range(num_agents):
             curr_file = agent_files[i]
-            curr_agent = self._build_agent(i, curr_file)
+            curr_agent = self._build_agent(i, curr_file, motion_name)
 
             if curr_agent is not None:
                 curr_agent.output_dir = output_path
@@ -133,12 +139,12 @@ class RLWorld(object):
                 agent.end_episode()
         return
 
-    def _build_agent(self, id, agent_file):
+    def _build_agent(self, id, agent_file, motion_name=None):
         Logger.print('Agent {:d}: {}'.format(id, agent_file))
         if (agent_file == 'none'):
             agent = None
         else:
-            agent = AgentBuilder.build_agent(self, id, agent_file)
+            agent = AgentBuilder.build_agent(self, id, agent_file, motion_name)
             assert (agent != None), 'Failed to build agent {:d} from: {}'.format(id, agent_file)
 
         return agent

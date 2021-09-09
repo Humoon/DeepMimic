@@ -88,21 +88,11 @@ class RLAgent(ABC):
         self.exp_params_end = ExpParams()
         self.exp_params_curr = ExpParams()
 
+        self.next_check_start_time = time.time() + 60
+
         # net server
-        self.ns_api = NameServerAPI()
-
-        self._logger = setup_logger(log_file="./training_server_log")
-        self.zmq_adaptor = ZmqAdaptor(logger=self._logger)
-        address, port = self.ns_api.register(rtype="train_server", extra={"data_type": "train", "zmq_mode": "pull"})
-        self.ip = "%s_%d" % (address, port)
-        self._logger.info(f"begin listen {self.ip}")
-        self.zmq_adaptor.start({"mode": "pull", "host": "*", "port": port})
-
-        self.ls_api = LogServerAPI(self.ns_api, self.zmq_adaptor)
-        self.ls_api.connect()
-        self.ls_api.init_moni(["model", "training_server"])
-
-        self.next_check_stat_time = time.time() + 60
+        self.register_train_server()
+        self.discovery_log_server()
 
         self._load_params(json_data)
         self._build_replay_buffer(self.replay_buffer_size)
@@ -149,10 +139,29 @@ class RLAgent(ABC):
             self._update_new_action()
         return
 
+    def register_train_server(self):
+        self.ns_api = NameServerAPI()
+        self._logger = setup_logger(log_file="./training_server_log")
+        self.zmq_adaptor = ZmqAdaptor(logger=self._logger)
+
+        address, port = self.ns_api.register(rtype="train_server", extra={"data_type": "train", "zmq_mode": "pull"})
+        self.ip = "%s_%d" % (address, port)
+        self._logger.info(f"begin listen {self.ip}")
+        self.zmq_adaptor.start({"mode": "pull", "host": "*", "port": port})
+        return
+
+    def discovery_log_server(self):
+        self.ls_api = LogServerAPI(self.ns_api, self.zmq_adaptor)
+        self._logger.info("wait to discover the logerver...")
+        self.ls_api.connect()
+        self._logger.info("successfully connect logerver!")
+        self.ls_api.init_moni(["model", "training_server"])
+        return
+
     def moni_check(self):
-        if time.time() > self.next_check_stat_time:
+        if time.time() > self.next_check_start_time:
             self.send_moni(msg_type="training_server")
-            self.next_check_stat_time += 5
+            self.next_check_start_time += 5
             self._logger.info("send moni to logserver.")
 
     def send_moni(self, msg_type=None):

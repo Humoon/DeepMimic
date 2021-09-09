@@ -1,5 +1,6 @@
 import re as RE
 
+
 class ArgParser(object):
     global_parser = None
 
@@ -108,7 +109,7 @@ class ArgParser(object):
             is_comment = str[0] == '#'
 
         return is_comment
-        
+
     def _is_key(self, str):
         is_key = False
         if (len(str) >= 3):
@@ -118,7 +119,6 @@ class ArgParser(object):
 
     def _parse_bool(self, str):
         val = False
-        if (str == 'true' or str == 'True' or str == '1' 
-            or str == 'T' or str == 't'):
+        if (str == 'true' or str == 'True' or str == '1' or str == 'T' or str == 't'):
             val = True
         return val

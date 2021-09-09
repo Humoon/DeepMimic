@@ -3,7 +3,9 @@ import numpy as np
 from enum import Enum
 from learning.normalizer import Normalizer
 
+
 class Env(ABC):
+
     class Terminate(Enum):
         Null = 0
         Fail = 1
@@ -68,7 +70,6 @@ class Env(ABC):
     def get_num_update_substeps(self):
         return 1
 
-
     # rl interface
     @abstractmethod
     def is_rl_scene(self):
@@ -93,11 +94,11 @@ class Env(ABC):
     @abstractmethod
     def set_action(self, agent_id):
         pass
-    
+
     @abstractmethod
     def get_action_space(self, agent_id):
         pass
-    
+
     @abstractmethod
     def get_state_size(self, agent_id):
         pass

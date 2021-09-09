@@ -25,11 +25,6 @@ log/
 output/
 summary_log/
 
-data/policies/dog3d/*
-data/policies/dog3d_amp/*
-data/policies/dog3d/humanoid3d/*
-data/policies/dog3d/humanoid3d_amp/*
-
 .vs/
 __pycache__/
 output/

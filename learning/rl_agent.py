@@ -1,11 +1,8 @@
-from logging import log
-from sys import implementation
-from loguru import logger
-from mpi4py.MPI import pickle
 import numpy as np
 import copy
 import os
 import time
+import pickle
 
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -53,6 +50,8 @@ class RLAgent(ABC):
         self.id = id
         self.logger = Logger()
         self._mode = self.Mode.TRAIN
+
+        self._logger = setup_logger(log_file="./training_server_log")
 
         assert self._check_action_space(), \
             Logger.print("Invalid action space, got {:s}".format(str(self.get_action_space())))
@@ -141,12 +140,11 @@ class RLAgent(ABC):
 
     def register_train_server(self):
         self.ns_api = NameServerAPI()
-        self._logger = setup_logger(log_file="./training_server_log")
-        self.zmq_adaptor = ZmqAdaptor(logger=self._logger)
-
         address, port = self.ns_api.register(rtype="train_server", extra={"data_type": "train", "zmq_mode": "pull"})
         self.ip = "%s_%d" % (address, port)
         self._logger.info(f"begin listen {self.ip}")
+
+        self.zmq_adaptor = ZmqAdaptor(logger=self._logger)
         self.zmq_adaptor.start({"mode": "pull", "host": "*", "port": port})
         return
 

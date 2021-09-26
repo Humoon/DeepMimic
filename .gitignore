@@ -19,6 +19,7 @@
 .vscode/
 .env
 .style.yapf
+*.out
 log/
 summary_log/
 tmp/

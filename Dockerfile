@@ -1,7 +1,6 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
-#制作者信息
-MAINTAINER guozongren
+MAINTAINER huyueyue
 
 RUN printf "deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse\n \
 deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse\n \
@@ -38,11 +37,11 @@ RUN apt-get install libglu1-mesa-dev freeglut3-dev -y
 RUN apt-get install mesa-utils -y
 RUN apt-get install clang -y
 
-RUN cd tmp/swig-4.0.0 && ./configure --without-pcre
-RUN cd tmp/swig-4.0.0 && make
-RUN cd tmp/swig-4.0.0 && make install
-RUN cd tmp/eigen-3.3.7 && mkdir build && cd build && cmake .. && make install
-RUN cd tmp/freeglut-3.0.0 && cmake . && make && make install
+RUN cd tmp/swig-4.0.2 && ./configure --without-pcre
+RUN cd tmp/swig-4.0.2 && make
+RUN cd tmp/swig-4.0.2 && make install
+RUN cd tmp/eigen-3.4.0 && mkdir build && cd build && cmake .. && make install
+RUN cd tmp/freeglut-3.2.1 && cmake . && make && make install
 RUN cd tmp/glew-2.2.0 && make && make install && make clean
 RUN cd tmp/bullet3-3.17 && echo * && sh build_cmake_pybullet_double.sh
 RUN cd tmp/bullet3-3.17/build_cmake && echo *  && make install
@@ -50,7 +49,8 @@ RUN cd tmp/bullet3-3.17/build_cmake && echo *  && make install
 RUN apt install libopenmpi-dev -y
 RUN apt-get update && apt-get install python-pip -y
 
-#安装python库
+
+#安装python库 
 COPY requirements.txt  requirements.txt
 RUN python -m pip install --upgrade --force pip -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
 RUN pip3 install setuptools==33.1.1 -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
@@ -58,7 +58,7 @@ RUN pip3 install --upgrade pip -i http://pypi.douban.com/simple/ --trusted-host 
 RUN pip3 install -r requirements.txt   --default-timeout=2000  -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
 
 #更正路径防止运行报错
-RUN ln -s /usr/lib64/libGLEW.so.2.1.0 /usr/lib/libGLEW.so.2.1.0
-RUN ln -s /usr/lib64/libGLEW.so.2.1 /usr/lib/libGLEW.so.2.1
+RUN ln -s /usr/lib64/libGLEW.so.2.2.0 /usr/lib/libGLEW.so.2.2.0
+RUN ln -s /usr/lib64/libGLEW.so.2.2 /usr/lib/libGLEW.so.2.2
 
 RUN apt install ssh -y

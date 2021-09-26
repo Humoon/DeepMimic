@@ -21,6 +21,7 @@
 .style.yapf
 log/
 summary_log/
+tmp/
 
 
 .vs/

@@ -5,8 +5,10 @@ MKDIR = mkdir -p
 EIGEN_DIR = /usr/local/include/eigen3
 BULLET_INC_DIR = /usr/local/include/bullet
 
-PYTHON_INC = /usr/include/python3.8
-PYTHON_LIB = /usr/lib/python3.8
+# PYTHON_INC = /usr/include/python3.8
+# PYTHON_LIB = /usr/lib/python3.8
+PYTHON_INC = /home/huyueyue/anaconda3/envs/mimic/include/python3.8
+PYTHON_LIB = /home/huyueyue/anaconda3/envs/mimic/lib/python3.8
 
 INC = -I./ \
 	-I$(EIGEN_DIR) \
